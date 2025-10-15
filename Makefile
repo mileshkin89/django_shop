@@ -20,7 +20,7 @@ build: ## Build docker containers
 	docker compose --env-file $(ENV_FILE) build
 
 up: ## Start all services
-	docker compose --env-file $(ENV_FILE) up
+	docker compose --env-file $(ENV_FILE) up -d
 # http://localhost:8000/
 
 down:  ## Stop all services
@@ -48,4 +48,36 @@ migrate: ## Run Django migrations
 	@docker compose --env-file $(ENV_FILE) stop db
 	@echo "========================================="
 	@echo "Django migrations completed!"
+	@echo "========================================="
+
+# ============================================
+# Database Seeding Commands
+# ============================================
+
+seed-all: ## Populate database with all test data (users, catalog, inventories, ratings, favorites)
+	@echo "========================================="
+	@echo "Database Full Seeding Process"
+	@echo "========================================="
+	@echo "Starting database..."
+	@docker compose --env-file $(ENV_FILE) up -d --wait --wait-timeout 60 db
+	@echo "Running full database seeding..."
+	@docker compose --env-file $(ENV_FILE) run --rm -e USE_PGBOUNCER=false web seed-all-data.sh
+	@echo "Stopping database..."
+	@docker compose --env-file $(ENV_FILE) stop db
+	@echo "========================================="
+	@echo "Database seeding completed!"
+	@echo "========================================="
+
+clean-all: ## Remove all test data from database (favorites, ratings, inventories, catalog, users)
+	@echo "========================================="
+	@echo "Database Full Cleanup Process"
+	@echo "========================================="
+	@echo "Starting database..."
+	@docker compose --env-file $(ENV_FILE) up -d --wait --wait-timeout 60 db
+	@echo "Running full database cleanup..."
+	@docker compose --env-file $(ENV_FILE) run --rm -e USE_PGBOUNCER=false web clean-all-data.sh
+	@echo "Stopping database..."
+	@docker compose --env-file $(ENV_FILE) stop db
+	@echo "========================================="
+	@echo "Database cleanup completed!"
 	@echo "========================================="

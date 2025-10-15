@@ -10,10 +10,29 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
+import warnings
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Project data paths
+# DATASETS_DIR_ENV = os.getenv('DATASETS_DIR')
+DATASETS_DIR_ENV = BASE_DIR.parent / "datasets"
+DATABASE_DIR = BASE_DIR.parent / "database"
+
+if not DATASETS_DIR_ENV:
+    warnings.warn(
+        "DATASETS_DIR environment variable is not set. "
+        "Dataset-related functionality may not work properly. "
+        "Set DATASETS_DIR to the path containing your dataset files.",
+        UserWarning,
+        stacklevel=2
+    )
+else:
+    DATASETS_DIR = Path(DATASETS_DIR_ENV)
+    IMAGES_DATASET_CSV = DATASETS_DIR / 'images.csv'
+    PRODUCTS_DATASET_CSV = DATASETS_DIR / 'products.csv'
 
 
 # Quick-start development settings - unsuitable for production
