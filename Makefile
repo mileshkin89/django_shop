@@ -21,6 +21,7 @@ build: ## Build docker containers
 
 up: ## Start all services
 	docker compose --env-file $(ENV_FILE) up
+# http://localhost:8000/
 
 down:  ## Stop all services
 	docker compose --env-file $(ENV_FILE) down
