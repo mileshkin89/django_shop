@@ -48,7 +48,7 @@ class Command(BaseCommand):
         start = time.perf_counter()
 
         cleaner = UserCleaner()
-        count = cleaner.cleen_users()
+        cleaner.cleen_users()
 
         total_time = time.perf_counter() - start
 
@@ -57,7 +57,6 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 f"Users cleared in {total_time:.3f}s. "
-                f"Deleted users: {count:,}. "
                 f"Remaining users: {remaining_users:,}"
             )
         )

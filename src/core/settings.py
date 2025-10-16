@@ -17,9 +17,9 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Project data paths
-# DATASETS_DIR_ENV = os.getenv('DATASETS_DIR')
-DATASETS_DIR_ENV = BASE_DIR.parent / "datasets"
-DATABASE_DIR = BASE_DIR.parent / "database"
+DATASETS_DIR_ENV = os.getenv('DATASETS_DIR')
+# DATASETS_DIR_ENV = BASE_DIR.parent / "datasets"
+# DATABASE_DIR = BASE_DIR.parent / "database"
 
 if not DATASETS_DIR_ENV:
     warnings.warn(

@@ -21,8 +21,6 @@ class UserGenerator(SaveInDBMixin):
         self.batch_size: int = batch_size
         self.password: str = password
 
-        self.user_model = User
-
 
     def seed_users(self):
         fake = Faker()
@@ -31,7 +29,7 @@ class UserGenerator(SaveInDBMixin):
         current_time = timezone.now()
 
         for i in tqdm(range(self.users_count)):
-            user = self.user_model(
+            user = User(
                 username=fake.user_name(),
                 email=fake.email(),
                 first_name=fake.first_name(),
@@ -45,27 +43,26 @@ class UserGenerator(SaveInDBMixin):
             users.append(user)
 
             if i % self.batch_size == 0:
-                self.bulk_insert(users, self.user_model)
+                self.bulk_insert(users, User)
                 users = []
 
         if users:
-            self.bulk_insert(users, self.user_model)
+            self.bulk_insert(users, User)
 
 
 class UserCleaner:
     def __init__(self):
-        self.user_model = User
+        self.non_admin_users = [
+            ("users", User.objects.exclude(username="admin"))
+        ]
 
     def cleen_users(self):
-        count = 0
-
-        non_admin_users = self.user_model.objects.exclude(username="admin")
-
         with transaction.atomic():
-            if non_admin_users.exists():
-                count, _ = non_admin_users.delete()
+            for label, qs in tqdm(self.non_admin_users, desc="Cleaning users"):
+                count, _ = qs.delete()
+                tqdm.write(f"Deleted {count} rows from {label}")
 
-        return count
+
 
 
 

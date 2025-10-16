@@ -6,7 +6,8 @@ echo "Database Full Cleanup Process"
 echo "========================================="
 echo "WARNING: This will delete ALL test data from the database!"
 echo "This includes:"
-echo "  1. Users"
+echo "  - Catalog"
+echo "  - Users"
 echo ""
 
 read -p "Are you sure you want to continue? Type 'yes' to confirm: " confirm
@@ -18,7 +19,12 @@ fi
 # Record start time
 START_TIME=$(date +%s)
 
-echo "Step 1: Cleaning users..."
+echo "Step 1: Cleaning catalog..."
+echo "-----------------------------------------"
+python manage.py clean_catalog --yes
+echo ""
+
+echo "Step 2: Cleaning users..."
 echo "-----------------------------------------"
 python manage.py clean_users --yes
 echo ""
