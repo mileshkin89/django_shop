@@ -19,7 +19,6 @@ urlpatterns = [
         name="product_list_by_article"),
 
     path('products/', views.ProductListView.as_view(), name='product_list'),
-    path('products/search/', views.ProductSearchListView.as_view(), name='product_search_list'),
     path('products/add/', views.ProductCreateView.as_view(), name='product_create'),
     path('products/<slug:slug>/edit/', views.ProductUpdateView.as_view(), name='product_update'),
     path('products/<slug:slug>/delete/', views.ProductDeleteView.as_view(), name='product_delete'),

@@ -55,6 +55,12 @@ class ProductListView(ListView):
     def get_queryset(self):
         queryset = self._get_base_queryset()
 
+        query = self.request.GET.get('q')
+        if query:
+            queryset = queryset.filter(
+                Q(product_display_name__icontains=query)
+            )
+
         queryset = self.apply_category_filters_queryset(queryset)
 
         gender_param = self.request.GET.get("gender")
@@ -124,27 +130,6 @@ class ProductListView(ListView):
             ("Catalog", None),
         ]
         return context
-
-
-class ProductSearchListView(ProductListView):
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        query = self.request.GET.get('q')
-
-        if query:
-            queryset = queryset.filter(
-                Q(product_display_name__icontains=query) # | Q(description__icontains=query)
-            )
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['current_query'] = self.request.GET.get('q', '')
-        return context
-
 
 
 class ProductByMasterCategoryListView(ProductListView):

@@ -63,45 +63,26 @@
 <!-- Product list and Search-->
             {% if current_query %}
                 <p>Search results for your query: "<strong>{{ current_query }}</strong>"</p>
-                <div class="product-grid">
-                    {% for product in products %}
-                        <div class="product-item">
-                            <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link">
-                                <div class="product-card">
-                                    <img src="{{product.image_url}}" alt="{{ product.product_display_name }}" class="product-card__image">
-                                    <div class="product-card__info">
-                                        <h4 class="product-card__name">{{ product.product_display_name }}</h4>
-                                        <p class="product-card__price">$5.99</p>
-                                        <p class="product-card__description">//Card description//</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
-
-            {% else %}
-                <div class="product-grid">
-                    {% for product in products %}
-                        <div class="product-item">
-                            <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link">
-                                <div class="product-card">
-                                    <img src="{{product.image_url}}" alt="{{ product.product_display_name }}" class="product-card__image">
-                                    <div class="product-card__info">
-                                        <h4 class="product-card__name">{{ product.product_display_name }}</h4>
-                                        <p class="product-card__price">$5.99</p>
-                                        <p class="product-card__description">//Card description//</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    {% empty %}
-                        No products
-                    {% endfor %}
-
-                </div>
             {% endif %}
 
+            <div class="product-grid">
+                {% for product in products %}
+                    <div class="product-item">
+                        <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link">
+                            <div class="product-card">
+                                <img src="{{product.image_url}}" alt="{{ product.product_display_name }}" class="product-card__image">
+                                <div class="product-card__info">
+                                    <h4 class="product-card__name">{{ product.product_display_name }}</h4>
+                                    <p class="product-card__price">$5.99</p>
+                                    <p class="product-card__description">//Card description//</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% empty %}
+                    No products
+                {% endfor %}
+            </div>
 
 <!-- Pagination -->
             {% include 'components/pagination.html' %}

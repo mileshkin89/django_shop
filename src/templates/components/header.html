@@ -59,7 +59,7 @@
     </nav>
 
     <!-- Block for search -->
-    <form method="get" action="{% url 'catalog:product_search_list' %}" class="search-input-wrapper">
+      <form method="get" action="{% url 'catalog:product_list' %}" class="search-input-wrapper">
         <input
             type="text"
             name="q"
@@ -71,12 +71,6 @@
             <i class="fa-solid fa-magnifying-glass"></i>
         </button>
     </form>
-{#    <div class="search-input-wrapper">#}
-{#        <input type="text" placeholder="Search" class="search-input">#}
-{#        <button class="search-button" aria-label="Search">#}
-{#            <i class="fa-solid fa-magnifying-glass"></i>#}
-{#        </button>#}
-{#    </div>#}
 
     <!-- Block for unauthorized user -->
     <div class="header__auth-buttons" id="auth-guest">
