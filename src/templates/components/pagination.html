@@ -1,0 +1,37 @@
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1{{ filter_query_string }}" class="pagination__link pagination__link--prev">
+            <i class="fa-solid fa-chevron-left"></i>
+            <i class="fa-solid fa-chevron-left"></i>
+            <span>First</span>
+        </a>
+        <a href="?page={{ page_obj.previous_page_number }}{{ filter_query_string }}" class="pagination__link">
+            <i class="fa-solid fa-chevron-left"></i>
+            <span>Previous</span>
+        </a>
+        <span class="pagination__dots">...</span>
+        <a href="?page={{ page_obj.previous_page_number }}{{ filter_query_string }}" class="pagination__link">{{ page_obj.previous_page_number }}</a>
+    {% endif %}
+
+    <div class="pagination-list">
+        <a href="#" class="pagination__link active">{{ page_obj.number }}</a>
+    </div>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{{ filter_query_string }}" class="pagination__link">{{ page_obj.next_page_number }}</a>
+        <span class="pagination__dots">...</span>
+        <a href="?page={{ page_obj.next_page_number }}{{ filter_query_string }}" class="pagination__link">
+            <span>Next</span>
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{{ filter_query_string }}" class="pagination__link pagination__link--next">
+            <span>Last</span>
+            <i class="fa-solid fa-chevron-right"></i>
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+    {% endif %}
+
+</div>
+{% endif %}
+

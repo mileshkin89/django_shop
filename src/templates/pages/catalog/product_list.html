@@ -1,0 +1,116 @@
+
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}Product List{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/components/pagination.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components/filter-sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components/active-filters.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/components/per-page-select.js' %}" defer></script>
+    <script src="{% static 'js/components/sort-select.js' %}" defer></script>
+    <script src="{% static 'js/components/filter-sidebar.js' %}" defer></script>
+    <script src="{% static 'js/components/active-filters.js' %}" defer></script>
+{% endblock %}
+
+
+{% block body_content %}
+
+    <div class="container main-content-grid">
+
+<!-- Breadcrumb navigate-->
+        {% include 'components/breadcrumb.html' %}
+
+<!-- Include Sidebar & Overlay -->
+        {% include 'components/filter_sidebar.html' %}
+
+<!-- Active Filters -->
+        {% include 'components/active_filters.html' %}
+
+<!-- Results count and Filters button -->
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <div class="text-muted small">
+            <i class="fas fa-database me-1"></i>
+            {{ page_obj.paginator.count }} results
+            {% if page_obj.paginator.count %}
+              <span class="ms-2">| Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}</span>
+            {% endif %}
+          </div>
+          <div>
+            <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center rounded-pill shadow-sm"
+                    id="filterButton">
+              <i class="fas fa-sliders fa-lg me-2"></i>
+              Filters
+            </button>
+          </div>
+        </div>
+
+<!-- Sort Per-page selects -->
+        <section class="products-area product-grid-section">
+            <div class="search-sort-bar">
+                <div class="sort-options">
+                    {% include 'components/sort_select.html' %}
+                </div>
+                <div class="sort-options">
+                    {% include 'components/per_page_select.html' %}
+                </div>
+            </div>
+
+<!-- Product list and Search-->
+            {% if current_query %}
+                <p>Search results for your query: "<strong>{{ current_query }}</strong>"</p>
+                <div class="product-grid">
+                    {% for product in products %}
+                        <div class="product-item">
+                            <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link">
+                                <div class="product-card">
+                                    <img src="{{product.image_url}}" alt="{{ product.product_display_name }}" class="product-card__image">
+                                    <div class="product-card__info">
+                                        <h4 class="product-card__name">{{ product.product_display_name }}</h4>
+                                        <p class="product-card__price">$5.99</p>
+                                        <p class="product-card__description">//Card description//</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            {% else %}
+                <div class="product-grid">
+                    {% for product in products %}
+                        <div class="product-item">
+                            <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link">
+                                <div class="product-card">
+                                    <img src="{{product.image_url}}" alt="{{ product.product_display_name }}" class="product-card__image">
+                                    <div class="product-card__info">
+                                        <h4 class="product-card__name">{{ product.product_display_name }}</h4>
+                                        <p class="product-card__price">$5.99</p>
+                                        <p class="product-card__description">//Card description//</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% empty %}
+                        No products
+                    {% endfor %}
+
+                </div>
+            {% endif %}
+
+
+<!-- Pagination -->
+            {% include 'components/pagination.html' %}
+
+        </section>
+    </div>
+
+{% endblock %}
+
+
+
+

@@ -11,7 +11,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--count",
             type=int,
-            default=1000,
+            default=5000,
             help="Total number of users to generate (default: 1000)",
         )
         parser.add_argument(

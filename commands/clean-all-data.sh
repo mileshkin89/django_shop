@@ -24,10 +24,10 @@ echo "-----------------------------------------"
 python manage.py clean_catalog --yes
 echo ""
 
-echo "Step 2: Cleaning users..."
-echo "-----------------------------------------"
-python manage.py clean_users --yes
-echo ""
+#echo "Step 2: Cleaning users..."
+#echo "-----------------------------------------"
+#python manage.py clean_users --yes
+#echo ""
 
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))

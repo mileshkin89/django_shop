@@ -1,0 +1,53 @@
+/* Footer */
+footer {
+    width: 100%;
+    padding: 48px 64px 24px 64px;
+    background-color: var(--black-main);
+    color: var(--white-text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+}
+
+.footer__hops-logo {
+    width: 483.92px;
+    height: 263.53px;
+}
+
+.footer__nav {
+    width: 640px;
+    height: 37px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer__nav ul {
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer__nav a {
+    font-size: 16px;
+    line-height: 1;
+    color: var(--white-text);
+    padding: 8px;
+    transition: opacity 0.2s ease;
+}
+
+.footer__nav a:hover {
+    opacity: 0.8;
+}
+
+.footer__copyright {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--white-text);
+    align-items: center;
+}

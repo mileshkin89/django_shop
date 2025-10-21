@@ -1,4 +1,4 @@
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.utils.http import urlencode
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
@@ -22,8 +22,8 @@ class ProductListView(ListView):
     template_name = 'pages/catalog/product_list.html'
     context_object_name = 'products'
 
-    paginate_by = 12
-    PER_PAGE_ALLOWED = {"8", "12", "16", "20", "24"}
+    paginate_by = 16
+    PER_PAGE_ALLOWED = {"12", "16", "20", "24"}
 
     def get_paginate_by(self, queryset):
         per_page = self.request.GET.get("per_page")
@@ -87,6 +87,8 @@ class ProductListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        context['current_query'] = self.request.GET.get('q', '')
+
         context["current_order"] = self.request.GET.get("ordering", "")
 
         per_page = self.request.GET.get("per_page")
@@ -122,6 +124,27 @@ class ProductListView(ListView):
             ("Catalog", None),
         ]
         return context
+
+
+class ProductSearchListView(ProductListView):
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        query = self.request.GET.get('q')
+
+        if query:
+            queryset = queryset.filter(
+                Q(product_display_name__icontains=query) # | Q(description__icontains=query)
+            )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['current_query'] = self.request.GET.get('q', '')
+        return context
+
 
 
 class ProductByMasterCategoryListView(ProductListView):

@@ -1,0 +1,97 @@
+{% load static %}
+
+<!-- Header -->
+<header>
+  <div class="header-container">
+    <a href="{% url 'catalog:home' %}" class="header__logo">
+      <img src="{% static 'img/logo.svg' %}" alt="Hop & Barley Logo">
+      <p class="logo-text">Django Shop</p>
+    </a>
+
+    <nav class="header__nav">
+      <ul>
+        <li><a href="{% url 'catalog:product_list' %}">Catalog</a></li>
+
+        <!-- Category drop-down menu -->
+        {% if nav_categories %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false">
+            Categories
+          </a>
+
+          <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+            {% for master in nav_categories %}
+              <li class="dropend">
+                <a class="dropdown-item dropdown-toggle" href="{{ master.get_absolute_url }}">
+                  {{ master.name }}
+                </a>
+
+                {% if master.sub_categories.all %}
+                <ul class="dropdown-menu">
+                  {% for sub in master.sub_categories.all %}
+                    <li class="dropend">
+                      <a class="dropdown-item dropdown-toggle" href="{{ sub.get_absolute_url }}">
+                        {{ sub.name }}
+                      </a>
+
+                      {% if sub.article_types.all %}
+                      <ul class="dropdown-menu">
+                        {% for atype in sub.article_types.all %}
+                          <li>
+                            <a class="dropdown-item" href="{{ atype.get_absolute_url }}">
+                              {{ atype.name }}
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+
+    <!-- Block for search -->
+    <form method="get" action="{% url 'catalog:product_search_list' %}" class="search-input-wrapper">
+        <input
+            type="text"
+            name="q"
+            placeholder="Search products..."
+            class="search-input"
+            value="{{ request.GET.q|default:'' }}"
+        >
+        <button type="submit" class="search-button" aria-label="Search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+    </form>
+{#    <div class="search-input-wrapper">#}
+{#        <input type="text" placeholder="Search" class="search-input">#}
+{#        <button class="search-button" aria-label="Search">#}
+{#            <i class="fa-solid fa-magnifying-glass"></i>#}
+{#        </button>#}
+{#    </div>#}
+
+    <!-- Block for unauthorized user -->
+    <div class="header__auth-buttons" id="auth-guest">
+      <a href="login.html" class="button button--secondary">Sign in</a>
+      <a href="register.html" class="button button--primary">Register</a>
+    </div>
+
+    <!-- Block for authorized user -->
+    <div class="header__user-actions" id="auth-user">
+      <a href="account.html" class="user-icon" aria-label="My Account">
+        <img src="../static/img/icons/User_alt.svg" alt="User Account">
+      </a>
+      <a href="cart.html" class="cart-icon" aria-label="Shopping Cart">
+        <img src="../static/img/icons/Shopping_bag.svg" alt="Shopping Cart">
+      </a>
+    </div>
+  </div>
+</header>

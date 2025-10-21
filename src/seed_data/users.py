@@ -12,7 +12,7 @@ User = get_user_model()
 class UserGenerator(SaveInDBMixin):
     def __init__(
             self,
-            users_count: int = 1000,
+            users_count: int = 5000,
             batch_size: int = 500,
             password: str = "password123",
     ):

@@ -1,0 +1,74 @@
+
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}Product Detail{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+
+{% block body_content %}
+
+    <main class="page-product">
+      <div class="container">
+
+        {% include 'components/breadcrumb.html' %}
+
+        <!-- Product Info Section -->
+        <section class="product-details-section">
+          <div class="product-image-container">
+            <img src="{{product.image_url}}" alt="{{product.product_display_name}}" class="product-image">
+          </div>
+          <div class="product-info-column">
+            <div class="product-title-price">
+              <h1 class="product-name">{{product.product_display_name}}</h1>
+              <div class="price-section">
+                <span class="price-tag">for 1 set</span>
+                <p class="product-price">$3.00</p>
+              </div>
+            </div>
+            <div class="product-description">
+              <p>//Description//</p>
+            </div>
+            <div class="cart-controls">
+              <button class="button button--primary add-to-cart-button" id="add-to-cart-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Add to Cart</span>
+              </button>
+              <div class="quantity-counter is-hidden" id="quantity-counter">
+                <button class="quantity-btn" data-action="decrease" aria-label="Decrease quantity"><i class="fa-solid fa-minus"></i></button>
+                <span class="quantity-value">1 in cart</span>
+                <button class="quantity-btn" data-action="increase" aria-label="Increase quantity"><i class="fa-solid fa-plus"></i></button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Technical Specifications Accordion -->
+        <section class="accordion-section">
+          <div class="accordion-item">
+            <div class="accordion-title">
+              <h3>Technical Specifications</h3>
+              <i class="fa-solid fa-chevron-down accordion-icon"></i>
+            </div>
+            <div class="accordion-content">
+              <ul>
+                <li><strong>Gender:</strong> {{product.gender}}</li>
+                <li><strong>Collection:</strong> {{product.year}}</li>
+                <li><strong>Color:</strong> {{product.base_colour}}</li>
+                <li><strong>Season:</strong> {{product.season}}</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+    {#    <!-- Latest Reviews Section -->#}
+
+      </div>
+    </main>
+
+{% endblock %}
