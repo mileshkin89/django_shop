@@ -1,4 +1,4 @@
-from .catalog.models import MasterCategory, SubCategory, ArticleType
+from apps.catalog.models import MasterCategory, SubCategory, ArticleType
 from django.db.models import Prefetch
 
 

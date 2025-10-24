@@ -26,7 +26,7 @@ def load_article_types(request):
 
 
 
-class HomePageViev(TemplateView):
+class HomePageView(TemplateView):
     template_name = 'pages/home.html'
 
     def get_context_data(self, **kwargs):
