@@ -10,13 +10,6 @@
     <link rel="stylesheet" href="{% static 'css/components/active-filters.css' %}">
 {% endblock %}
 
-{% block extra_js %}
-    <script src="{% static 'js/components/per-page-select.js' %}" defer></script>
-    <script src="{% static 'js/components/sort-select.js' %}" defer></script>
-    <script src="{% static 'js/components/filter-sidebar.js' %}" defer></script>
-    <script src="{% static 'js/components/active-filters.js' %}" defer></script>
-{% endblock %}
-
 
 {% block body_content %}
 
@@ -92,6 +85,13 @@
 
 {% endblock %}
 
+
+{% block extra_js %}
+    <script src="{% static 'js/components/per-page-select.js' %}"></script>
+    <script src="{% static 'js/components/sort-select.js' %}"></script>
+    <script src="{% static 'js/components/filter-sidebar.js' %}"></script>
+    <script src="{% static 'js/components/active-filters.js' %}"></script>
+{% endblock %}
 
 
 

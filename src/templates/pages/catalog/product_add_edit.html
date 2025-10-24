@@ -1,0 +1,54 @@
+
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.slug %}Edit product{% else %}Add new product{% endif %}{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+
+{% block body_content %}
+    <div class="container">
+        <h1 class="my-4">{% if form.instance.slug %}Edit product {{ product.product_display_name }}{% else %}Add new product{% endif %}</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <div class="mt-3 d-flex gap-2">
+                <!-- Primary action: Save / Create -->
+                <button type="submit" class="btn btn-primary">
+                    {% if form.instance.slug %}Save changes{% else %}Create{% endif %}
+                </button>
+
+                <!-- Secondary action: Cancel -->
+                <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+
+                <!-- Danger action: Delete (only if editing) -->
+                {% if form.instance.slug %}
+                    <a href="{% url 'catalog:product_delete' form.instance.slug %}" class="btn btn-danger">
+                        Delete
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+    {% if form.instance.slug %}
+        <script src="{% static 'js/pages/product_edit.js' %}"></script>
+    {% else %}
+        <script src="{% static 'js/pages/product_add.js' %}"></script>
+    {% endif %}
+
+{% endblock %}
+
+
+
+

@@ -1,9 +1,29 @@
 from django.db.models import Prefetch, Q
+from django.http import JsonResponse
 from django.utils.http import urlencode
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+
+from .forms import ProductForm
 from .models import Product, MasterCategory, SubCategory, ArticleType
 from django.urls import reverse_lazy, reverse
+
+
+
+
+def load_subcategories(request):
+    master_category_id = request.GET.get('master_category')
+    subcategories = SubCategory.objects.filter(master_category_id=master_category_id).order_by('name')
+    data = [{'id': sub.id, 'name': sub.name} for sub in subcategories]
+    return JsonResponse(data, safe=False)
+
+
+def load_article_types(request):
+    sub_category_id = request.GET.get('sub_category')
+    article_types = ArticleType.objects.filter(sub_category_id=sub_category_id).order_by('name')
+    data = [{'id': a.id, 'name': a.name} for a in article_types]
+    return JsonResponse(data, safe=False)
+
 
 
 class HomePageViev(TemplateView):
@@ -267,8 +287,8 @@ class ProductDetailView(DetailView):
 
 class ProductCreateView(CreateView):
     model = Product
-    fields = ['product_display_name', 'gender', 'season']
-    template_name = 'pages/catalog/product_form.html'
+    form_class = ProductForm
+    template_name = 'pages/catalog/product_add_edit.html'
     success_url = reverse_lazy('catalog:product_detail')
 
     def get_success_url(self):
@@ -276,12 +296,31 @@ class ProductCreateView(CreateView):
             "catalog:product_detail",
             kwargs={"slug": self.object.slug}
         )
+
+    def get_initial(self):
+        initial = super().get_initial()
+        first_master = MasterCategory.objects.first()
+        if first_master:
+            initial['master_category'] = first_master
+
+            first_sub = SubCategory.objects.filter(master_category=first_master).first()
+            if first_sub:
+                initial['sub_category'] = first_sub
+
+                first_article_type = ArticleType.objects.filter(sub_category=first_sub).first()
+                if first_article_type:
+                    initial['article_type'] = first_article_type
+
+        initial['year'] = 2025
+
+
+        return initial
 
 
 class ProductUpdateView(UpdateView):
     model = Product
-    fields = ['product_display_name', 'gender', 'season']
-    template_name = 'pages/catalog/product_form.html'
+    form_class = ProductForm
+    template_name = 'pages/catalog/product_add_edit.html'
     success_url = reverse_lazy('catalog:product_detail')
 
     def get_success_url(self):
@@ -289,6 +328,14 @@ class ProductUpdateView(UpdateView):
             "catalog:product_detail",
             kwargs={"slug": self.object.slug}
         )
+
+    def get_initial(self):
+        initial = super().get_initial()
+        product = self.get_object()
+        initial['master_category'] = product.article_type.sub_category.master_category
+        initial['sub_category'] = product.article_type.sub_category
+        initial['article_type'] = product.article_type
+        return initial
 
 
 class ProductDeleteView(DeleteView):

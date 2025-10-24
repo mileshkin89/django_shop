@@ -95,11 +95,11 @@ class UsageType(models.Model):
 
 
 class Product(models.Model):
-    product_id = models.IntegerField(unique=True)
-    gender = models.CharField(max_length=10, choices=GenderChoices.choices)
-    year = models.SmallIntegerField()
+    product_id = models.IntegerField(unique=True, null=True, blank=True)
+    gender = models.CharField(max_length=10, choices=GenderChoices.choices, null=True, blank=True)
+    year = models.SmallIntegerField(null=True, blank=True)
     product_display_name = models.TextField()
-    image_url = models.TextField()
+    image_url = models.TextField(null=True, blank=True)
     slug = AutoSlugField(
         populate_from=['product_display_name', 'product_id'],
         unique=True,
@@ -118,16 +118,22 @@ class Product(models.Model):
         'BaseColour',
         on_delete=models.RESTRICT,
         related_name='products',
+        null = True,
+        blank = True
     )
     season = models.ForeignKey(
         'Season',
         on_delete=models.RESTRICT,
         related_name='products',
+        null=True,
+        blank=True
     )
     usage_type = models.ForeignKey(
         'UsageType',
         on_delete=models.RESTRICT,
         related_name='products',
+        null=True,
+        blank=True
     )
 
     class Meta:
