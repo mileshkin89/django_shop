@@ -1,10 +1,18 @@
-
 {% extends 'layout/base.html' %}
 {% load static %}
 
 {% block title %}{% if form.instance.slug %}Edit product{% else %}Add new product{% endif %}{% endblock %}
 
 {% block extra_css %}
+{% endblock %}
+
+{% block extra_js %}
+    {% if form.instance.slug %}
+        <script src="{% static 'js/pages/product_edit.js' %}"></script>
+    {% else %}
+        <script src="{% static 'js/pages/product_add.js' %}"></script>
+    {% endif %}
+
 {% endblock %}
 
 
@@ -35,7 +43,8 @@
             {% endif %}
         </div>
 
-        <h1 class="my-4">{% if form.instance.slug %}Edit product {{ product.product_display_name }}{% else %}Add new product{% endif %}</h1>
+        <h1 class="my-4">{% if form.instance.slug %}Edit product {{ product.product_display_name }}{% else %}Add new
+            product{% endif %}</h1>
 
         <form method="post">
             {% csrf_token %}
@@ -44,17 +53,3 @@
     </div>
 
 {% endblock %}
-
-
-{% block extra_js %}
-    {% if form.instance.slug %}
-        <script src="{% static 'js/pages/product_edit.js' %}"></script>
-    {% else %}
-        <script src="{% static 'js/pages/product_add.js' %}"></script>
-    {% endif %}
-
-{% endblock %}
-
-
-
-
