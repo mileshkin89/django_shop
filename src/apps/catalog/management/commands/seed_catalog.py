@@ -2,7 +2,7 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from seed_data.catalog import ProductGenerator
+from seed_data.catalog.catalog import ProductGenerator
 
 
 class Command(BaseCommand):
@@ -36,8 +36,8 @@ class Command(BaseCommand):
             "--batch-size",
             dest="batch_size",
             type=int,
-            default=500,
-            help="How many products write to DB at once (default: 500)",
+            default=1000,
+            help="How many products write to DB at once (default: 1000)",
         )
 
     def handle(self, *args, **options):

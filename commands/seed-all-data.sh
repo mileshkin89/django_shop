@@ -6,7 +6,8 @@ echo "Database Full Seeding Process"
 echo "========================================="
 echo "This script will populate the database with all test data:"
 echo "  1. Users"
-echo "  2. Catalog"
+echo "  2. Address"
+echo "  3. Catalog"
 echo ""
 
 START_TIME=$(date +%s)
@@ -17,10 +18,16 @@ python manage.py seed_users
 echo ""
 
 
-#echo "Step 2: Seeding catalog data..."
-#echo "-----------------------------------------"
-#python manage.py seed_catalog
-#echo ""
+echo "Step 2: Seeding address..."
+echo "-----------------------------------------"
+python manage.py seed_address
+echo ""
+
+
+echo "Step 3: Seeding catalog data..."
+echo "-----------------------------------------"
+python manage.py seed_catalog
+echo ""
 
 
 END_TIME=$(date +%s)

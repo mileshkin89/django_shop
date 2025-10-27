@@ -2,13 +2,14 @@ import time
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from seed_data.users.users import UserCleaner
 
+from apps.accounts.models import ShippingAddress
+from seed_data.address.address import AddressCleaner
 
 User = get_user_model()
 
 class Command(BaseCommand):
-    help = "Clear user data (deletes all users except 'admin')."
+    help = "Clear user delivery addresses."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -19,44 +20,42 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        current_users = User.objects.count()
-        admin_users = User.objects.filter(username="admin").count()
-        users_to_delete = current_users - admin_users
+        address = ShippingAddress.objects.all()
+        count = address.count()
 
         self.stdout.write(
             self.style.NOTICE(
-                f"Current users: {current_users:,} total, {admin_users} admin(s), "
-                f"{users_to_delete:,} will be deleted"
+                f"{count:,} addresses will be deleted"
             )
         )
 
-        if users_to_delete == 0:
-            self.stdout.write(self.style.WARNING("No users to delete."))
+        if count == 0:
+            self.stdout.write(self.style.WARNING("No addresses to delete."))
             return
 
         confirmed = options["yes"]
         if not confirmed:
             answer = input(
-                f"This will DELETE {users_to_delete:,} users (keeping admin). "
+                f"This will DELETE {count:,} addresses. "
                 "Are you sure? Type 'yes' to continue: "
             )
             if answer.strip().lower() != "yes":
                 self.stdout.write(self.style.WARNING("Aborted."))
                 return
 
-        self.stdout.write(self.style.NOTICE("Clearing user data..."))
+        self.stdout.write(self.style.NOTICE("Clearing addresses..."))
         start = time.perf_counter()
 
-        cleaner = UserCleaner()
+        cleaner = AddressCleaner()
         cleaner.cleen_users()
 
         total_time = time.perf_counter() - start
 
-        remaining_users = User.objects.count()
+        remaining_address = address.count()
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Users cleared in {total_time:.3f}s. "
-                f"Remaining users: {remaining_users:,}"
+                f"Addresses cleared in {total_time:.3f}s. "
+                f"Remaining addresses: {remaining_address:,}"
             )
         )

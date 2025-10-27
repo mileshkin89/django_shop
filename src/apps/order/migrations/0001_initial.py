@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('accounts', '0002_shippingaddress'),
+        ('accounts', '__first__'),
         ('catalog', '0003_alter_product_base_colour_alter_product_gender_and_more'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]

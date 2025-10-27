@@ -7,6 +7,7 @@ echo "========================================="
 echo "WARNING: This will delete ALL test data from the database!"
 echo "This includes:"
 echo "  - Catalog"
+echo "  - Addresses"
 echo "  - Users"
 echo ""
 
@@ -19,15 +20,20 @@ fi
 # Record start time
 START_TIME=$(date +%s)
 
-echo "Step 1: Cleaning catalog..."
+#echo "Step 1: Cleaning catalog..."
+#echo "-----------------------------------------"
+#python manage.py clean_catalog --yes
+#echo ""
+
+echo "Step 2: Cleaning addresses..."
 echo "-----------------------------------------"
-python manage.py clean_catalog --yes
+python manage.py clean_address --yes
 echo ""
 
-#echo "Step 2: Cleaning users..."
-#echo "-----------------------------------------"
-#python manage.py clean_users --yes
-#echo ""
+echo "Step 3: Cleaning users..."
+echo "-----------------------------------------"
+python manage.py clean_users --yes
+echo ""
 
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))

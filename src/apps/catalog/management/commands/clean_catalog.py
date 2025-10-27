@@ -2,7 +2,7 @@ import time
 
 from django.core.management.base import BaseCommand
 
-from seed_data.catalog import ProductCleaner
+from seed_data.catalog.catalog import ProductCleaner
 
 
 class Command(BaseCommand):

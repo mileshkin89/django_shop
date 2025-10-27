@@ -40,6 +40,7 @@ class ProductDTO:
     gender: str
     year: Optional[int] = None
     product_display_name: Optional[str] = None
+    description: Optional[str] = None
     article_type: str = ""
     base_colour: Optional[str] = None
     season: Optional[str] = None

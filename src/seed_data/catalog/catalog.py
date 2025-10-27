@@ -5,8 +5,9 @@ from typing import Dict, Iterable, List, Tuple
 
 from django.db import transaction
 from django.utils.text import slugify
+from seed_data.catalog.description import get_random_description
 
-from .dto import (
+from seed_data.catalog.dto import (
     MasterCategoryDTO,
     SubCategoryDTO,
     ArticleTypeDTO,
@@ -28,13 +29,12 @@ from apps.catalog.models import (
 )
 
 
-
 class ProductGenerator:
     def __init__(
             self,
             products_path,
             images_path,
-            batch_size = 500
+            batch_size = 1000
     ):
         self.products_path: Path = products_path
         self.images_path: Path = images_path
@@ -150,6 +150,7 @@ class ProductGenerator:
                     gender=str(row["gender"]),
                     year=int(row["year"]),
                     product_display_name=str(row["product_display_name"]),
+                    description=str(get_random_description()),
                     article_type=str(row["article_type"]),
                     base_colour=str(row["base_colour"]),
                     season=str(row["season"]),
@@ -320,6 +321,7 @@ class ProductGenerator:
                     gender=dto.gender,
                     year=dto.year,
                     product_display_name=dto.product_display_name,
+                    description=dto.description,
                     image_url=images_map.get(dto.product_id),
                     slug=slug,
                     article_type=article_type,

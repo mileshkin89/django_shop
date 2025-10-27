@@ -50,7 +50,7 @@ class OrderItem(models.Model):
         on_delete=models.CASCADE,
         related_name='order_item',
     )
-    price = models.ForeignKey(
+    inventory = models.ForeignKey(
         'Inventory',
         on_delete=models.RESTRICT,
         related_name='order_item',
@@ -58,11 +58,15 @@ class OrderItem(models.Model):
 
     quantity = models.PositiveIntegerField(default=1)
 
+    @property
+    def total_price_items(self):
+        return self.inventory.price * self.quantity
+
     def __str__(self):
         return f"{self.order.user.username} - {self.order.status}"
 
     class Meta:
-        ordering = ['-price', '-quantity']
+        ordering = ['-inventory__price', '-quantity']
 
 
 class Inventory(models.Model):

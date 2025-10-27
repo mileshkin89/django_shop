@@ -1,8 +1,10 @@
 import time
 
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from seed_data.users import UserGenerator
+from seed_data.users.users import UserGenerator
 
+User = get_user_model()
 
 class Command(BaseCommand):
     help = 'Seeds the database with initial user data.'
@@ -11,15 +13,15 @@ class Command(BaseCommand):
         parser.add_argument(
             "--count",
             type=int,
-            default=5000,
-            help="Total number of users to generate (default: 1000)",
+            default=10000,
+            help="Total number of users to generate (default: 10000)",
         )
         parser.add_argument(
             "--batch-size",
             dest="batch_size",
             type=int,
-            default=500,
-            help="How many users to create at once (default: 500)",
+            default=1000,
+            help="How many users to create at once (default: 1000)",
         )
         parser.add_argument(
             "--password",
@@ -47,5 +49,7 @@ class Command(BaseCommand):
 
         total = time.perf_counter() - start
 
+        inserted_users = User.objects.count()
+
         self.stdout.write(self.style.SUCCESS(f"Users seeded in {total:.3f}s"))
-        self.stdout.write(self.style.SUCCESS(f"Total inserted {users_count} users."))
+        self.stdout.write(self.style.SUCCESS(f"Total inserted {inserted_users} users."))

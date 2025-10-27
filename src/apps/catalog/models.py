@@ -99,6 +99,7 @@ class Product(models.Model):
     gender = models.CharField(max_length=10, choices=GenderChoices.choices, null=True, blank=True)
     year = models.SmallIntegerField(null=True, blank=True)
     product_display_name = models.TextField()
+    description = models.TextField(null=True, blank=True)
     image_url = models.TextField(null=True, blank=True)
     slug = AutoSlugField(
         populate_from=['product_display_name', 'product_id'],
