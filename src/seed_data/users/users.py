@@ -1,5 +1,6 @@
 from typing import List, Tuple
 
+from django.utils import timezone
 from tqdm import tqdm
 from faker import Faker
 
@@ -26,13 +27,27 @@ class UserGenerator(SaveInDBMixin):
     def seed_users(self):
         fake = Faker()
         users = []
+        hash_password = None
+
+        current_time = timezone.now()
 
         for i in tqdm(range(self.users_count)):
             user = User(
-                product=fake.user_name(),
-                stock=fake.email(),
-                price=get_random_phone_number(),
+                username=fake.user_name(),
+                email=fake.email(),
+                phone_number=get_random_phone_number(),
+                first_name=fake.first_name(),
+                last_name=fake.last_name(),
+                is_active=True,
+                is_staff=False,
+                is_superuser=False,
+                date_joined=current_time,
             )
+            if hash_password:
+                user.password = hash_password
+            else:
+                user.set_password(self.password)
+                hash_password = user.password
             users.append(user)
 
             if i % self.batch_size == 0:
