@@ -1,15 +1,13 @@
 import time
 
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from apps.accounts.models import ShippingAddress
-from seed_data.address.address import AddressCleaner
+from apps.order.models import Inventory
+from seed_data.order.inventory import InventoryCleaner
 
-User = get_user_model()
 
 class Command(BaseCommand):
-    help = "Clear user delivery addresses."
+    help = "Clear product inventory."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -20,42 +18,42 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        address = ShippingAddress.objects.all()
-        count = address.count()
+        inventory = Inventory.objects.all()
+        count = inventory.count()
 
         self.stdout.write(
             self.style.NOTICE(
-                f"{count:,} addresses will be deleted"
+                f"{count:,} inventory rows will be deleted"
             )
         )
 
         if count == 0:
-            self.stdout.write(self.style.WARNING("No addresses to delete."))
+            self.stdout.write(self.style.WARNING("No inventory to delete."))
             return
 
         confirmed = options["yes"]
         if not confirmed:
             answer = input(
-                f"This will DELETE {count:,} addresses. "
+                f"This will DELETE {count:,} inventory rows. "
                 "Are you sure? Type 'yes' to continue: "
             )
             if answer.strip().lower() != "yes":
                 self.stdout.write(self.style.WARNING("Aborted."))
                 return
 
-        self.stdout.write(self.style.NOTICE("Clearing addresses..."))
+        self.stdout.write(self.style.NOTICE("Clearing inventory..."))
         start = time.perf_counter()
 
-        cleaner = AddressCleaner()
-        cleaner.clean_address()
+        cleaner = InventoryCleaner()
+        cleaner.clean_inventory()
 
         total_time = time.perf_counter() - start
 
-        remaining_address = address.count()
+        remaining_inventory = inventory.count()
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Addresses cleared in {total_time:.3f}s. "
-                f"Remaining addresses: {remaining_address:,}"
+                f"inventory cleared in {total_time:.3f}s. "
+                f"Remaining inventory: {remaining_inventory:,}"
             )
         )

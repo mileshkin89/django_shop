@@ -27,6 +27,7 @@ from apps.catalog.models import (
     UsageType,
     Product,
 )
+from seed_data.mixins import DataCleanerMixin
 
 
 class ProductGenerator:
@@ -336,7 +337,7 @@ class ProductGenerator:
             Product.objects.bulk_create(batch, batch_size=self.batch_size, ignore_conflicts=True)
 
 
-class ProductCleaner:
+class ProductCleaner(DataCleanerMixin):
     def __init__(self) -> None:
         self._data_to_delete: List[Tuple[str, object]] = [
             ("Products", Product.objects.all()),
@@ -347,10 +348,8 @@ class ProductCleaner:
             ("Seasons", Season.objects.all()),
             ("Usage types", UsageType.objects.all()),
         ]
+        self.desc = "Cleaning catalog"
 
 
-    def clean_catalog(self) -> None:
-        with transaction.atomic():
-            for label, qs in tqdm(self._data_to_delete, desc="Cleaning catalog"):
-                count, _ = qs.delete()
-                tqdm.write(f"Deleted {count} rows from {label}")
+    def clean_catalog(self):
+        self.clean_data(self._data_to_delete, self.desc)

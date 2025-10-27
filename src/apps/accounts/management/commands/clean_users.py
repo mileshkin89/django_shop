@@ -48,7 +48,7 @@ class Command(BaseCommand):
         start = time.perf_counter()
 
         cleaner = UserCleaner()
-        cleaner.cleen_users()
+        cleaner.clean_users()
 
         total_time = time.perf_counter() - start
 

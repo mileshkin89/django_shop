@@ -20,8 +20,8 @@ class Command(BaseCommand):
             "--batch-size",
             dest="batch_size",
             type=int,
-            default=1000,
-            help="How many users to create at once (default: 1000)",
+            default=2000,
+            help="How many users to create at once (default: 2000)",
         )
         parser.add_argument(
             "--password",
