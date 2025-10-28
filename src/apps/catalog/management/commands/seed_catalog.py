@@ -36,8 +36,8 @@ class Command(BaseCommand):
             "--batch-size",
             dest="batch_size",
             type=int,
-            default=1000,
-            help="How many products write to DB at once (default: 1000)",
+            default=5000,
+            help="How many products write to DB at once (default: 5000)",
         )
 
     def handle(self, *args, **options):

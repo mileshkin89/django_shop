@@ -15,7 +15,7 @@ class UserGenerator(SaveInDBMixin):
     def __init__(
             self,
             users_count: int =10000,
-            batch_size: int = 2000,
+            batch_size: int = 5000,
             password: str = "password123",
     ):
         super().__init__()

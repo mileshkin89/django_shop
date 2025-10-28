@@ -15,7 +15,7 @@ class Command(BaseCommand):
             dest="batch_size",
             type=int,
             default=5000,
-            help="How many users to create at once (default: 1000)",
+            help="How many users to create at once (default: 5000)",
         )
 
     def handle(self, *args, **options):
@@ -28,11 +28,11 @@ class Command(BaseCommand):
         seed_data = InventoryGenerator(
             batch_size=batch_size,
         )
-        seed_data.seed_users()
+        seed_data.seed_inventories()
 
         total = time.perf_counter() - start
 
         inserted_rows = Inventory.objects.count()
 
-        self.stdout.write(self.style.SUCCESS(f"Users seeded in {total:.3f}s"))
+        self.stdout.write(self.style.SUCCESS(f"Inventory seeded in {total:.3f}s"))
         self.stdout.write(self.style.SUCCESS(f"Total inserted {inserted_rows} rows inventory."))

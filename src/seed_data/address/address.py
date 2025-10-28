@@ -14,20 +14,18 @@ User = get_user_model()
 class AddressGenerator(SaveInDBMixin):
     def __init__(
             self,
-            batch_size: int = 2000,
+            batch_size: int = 5000,
     ):
         super().__init__()
         self.batch_size: int = batch_size
 
-    def seed_users(self):
+    def seed_addresses(self):
         fake = Faker()
         addresses = []
 
-        users_count = User.objects.count()
-        users = User.objects.all()
+        users = User.objects.all().only("id")
 
-        for i in tqdm(range(users_count)):
-            user = users[i]
+        for user in tqdm(users.iterator(), total=User.objects.count()):
             for j in range(random.randint(0, 3)):
                 address = ShippingAddress(
                     user=user,
@@ -35,7 +33,7 @@ class AddressGenerator(SaveInDBMixin):
                 )
                 addresses.append(address)
 
-            if i % self.batch_size == 0:
+            if len(addresses) >= self.batch_size:
                 self.bulk_insert(addresses, ShippingAddress)
                 addresses = []
 

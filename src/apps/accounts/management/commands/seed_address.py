@@ -14,8 +14,8 @@ class Command(BaseCommand):
             "--batch-size",
             dest="batch_size",
             type=int,
-            default=2000,
-            help="How many users to create at once (default: 1000)",
+            default=5000,
+            help="How many users to create at once (default: 5000)",
         )
 
 
@@ -29,7 +29,7 @@ class Command(BaseCommand):
         seed_data = AddressGenerator(
             batch_size=batch_size,
         )
-        seed_data.seed_users()
+        seed_data.seed_addresses()
 
         total = time.perf_counter() - start
 

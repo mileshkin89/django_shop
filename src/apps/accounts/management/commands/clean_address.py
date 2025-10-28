@@ -1,12 +1,10 @@
 import time
 
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
 from apps.accounts.models import ShippingAddress
 from seed_data.address.address import AddressCleaner
 
-User = get_user_model()
 
 class Command(BaseCommand):
     help = "Clear user delivery addresses."
@@ -20,8 +18,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        address = ShippingAddress.objects.all()
-        count = address.count()
+        count = ShippingAddress.objects.count()
 
         self.stdout.write(
             self.style.NOTICE(
@@ -51,7 +48,7 @@ class Command(BaseCommand):
 
         total_time = time.perf_counter() - start
 
-        remaining_address = address.count()
+        remaining_address = ShippingAddress.objects.count()
 
         self.stdout.write(
             self.style.SUCCESS(

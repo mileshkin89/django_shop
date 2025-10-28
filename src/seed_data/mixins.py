@@ -15,7 +15,6 @@ class SaveInDBMixin:
         self.style = style
 
     def bulk_insert(self, data: list, model):
-
         try:
             with transaction.atomic():
                 model.objects.bulk_create(data, ignore_conflicts=True)

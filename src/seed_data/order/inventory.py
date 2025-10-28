@@ -14,14 +14,12 @@ class InventoryGenerator(SaveInDBMixin):
         super().__init__()
         self.batch_size: int = batch_size
 
-    def seed_users(self):
-        inventory_s = []
+    def seed_inventories(self):
+        inventories = []
 
-        product_count = Product.objects.count()
-        products = Product.objects.all()
+        products = Product.objects.all().only("id")
 
-        for i in tqdm(range(product_count)):
-            product = products[i]
+        for product in tqdm(products.iterator(), total=Product.objects.count()):
             price = random.randint(2, 50)
             for j in range(random.randint(1, 3)):
                 inventory = Inventory(
@@ -29,14 +27,14 @@ class InventoryGenerator(SaveInDBMixin):
                     stock=random.randint(0, 80),
                     price=price + 0.99 * j,
                 )
-                inventory_s.append(inventory)
+                inventories.append(inventory)
 
-            if i % self.batch_size == 0:
-                self.bulk_insert(inventory_s, Inventory)
-                inventory_s = []
+                if len(inventories) >= self.batch_size:
+                    self.bulk_insert(inventories, Inventory)
+                    inventories = []
 
-        if inventory_s:
-            self.bulk_insert(inventory_s, Inventory)
+        if inventories:
+            self.bulk_insert(inventories, Inventory)
 
 
 class InventoryCleaner(DataCleanerMixin):

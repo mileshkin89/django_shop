@@ -22,7 +22,7 @@ echo "Step 2: Seeding address..."
 echo "-----------------------------------------"
 python manage.py seed_address
 echo ""
-
+#
 echo "Step 3: Seeding catalog data..."
 echo "-----------------------------------------"
 python manage.py seed_catalog

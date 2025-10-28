@@ -35,7 +35,7 @@ class ProductGenerator:
             self,
             products_path,
             images_path,
-            batch_size = 1000
+            batch_size = 5000
     ):
         self.products_path: Path = products_path
         self.images_path: Path = images_path

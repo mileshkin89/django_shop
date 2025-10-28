@@ -18,8 +18,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        inventory = Inventory.objects.all()
-        count = inventory.count()
+        count = Inventory.objects.count()
 
         self.stdout.write(
             self.style.NOTICE(
@@ -49,7 +48,7 @@ class Command(BaseCommand):
 
         total_time = time.perf_counter() - start
 
-        remaining_inventory = inventory.count()
+        remaining_inventory = Inventory.objects.count()
 
         self.stdout.write(
             self.style.SUCCESS(
