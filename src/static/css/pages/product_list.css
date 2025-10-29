@@ -1,0 +1,37 @@
+/*  Add to Cart" Button  */
+.add-to-cart-btn-itemlist {
+    width: 80px;
+    height: 32px;
+    padding: 12px;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.add-to-cart-btn-itemlist .fa-check {
+    display: none;
+}
+.add-to-cart-btn-itemlist.is-added {
+    background-color: var(--dark-green);
+    cursor: default;
+}
+.add-to-cart-btn-itemlist.is-added .fa-cart-shopping {
+    display: none;
+}
+.add-to-cart-btn-itemlist.is-added .fa-check {
+    display: inline-block;
+}
+
+.add-to-cart-btn-itemlist:active {
+    transform: translateY(1px);
+}
+
+.add-to-cart-btn-itemlist:disabled {
+    background-color: #8e9e91;
+}
+
+.product-card__price__btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}

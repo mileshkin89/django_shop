@@ -5,12 +5,15 @@
 {% block title %}Product List{% endblock %}
 
 {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/product_list.css' %}">
     <link rel="stylesheet" href="{% static 'css/components/pagination.css' %}">
     <link rel="stylesheet" href="{% static 'css/components/filter-sidebar.css' %}">
     <link rel="stylesheet" href="{% static 'css/components/active-filters.css' %}">
 {% endblock %}
 
 {% block extra_js %}
+    <script src="{% static 'js/utils.js' %}" defer></script>
+    <script src="{% static 'js/pages/product_list.js' %}" defer></script>
     <script src="{% static 'js/components/per-page-select.js' %}" defer></script>
     <script src="{% static 'js/components/sort-select.js' %}" defer></script>
     <script src="{% static 'js/components/filter-sidebar.js' %}" defer></script>
@@ -68,16 +71,23 @@
             <div class="product-grid">
                 {% for product in products %}
                     <div class="product-item">
-                        <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link">
                             <div class="product-card">
-                                <img src="{{product.image_url}}" alt="{{ product.product_display_name }}" class="product-card__image">
+                                <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link">
+                                    <img src="{{product.image_url}}" alt="{{ product.product_display_name }}" class="product-card__image">
+                                </a>
                                 <div class="product-card__info">
-                                    <h4 class="product-card__name">{{ product.product_display_name }}</h4>
-                                    <p class="product-card__price">$5.99</p>
-                                    <p class="product-card__description">//Card description//</p>
+                                    <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link">
+                                        <h4 class="product-card__name">{{ product.product_display_name }}</h4>
+                                    </a>
+                                    <div class="product-card__price__btn">
+                                        <p class="product-card__price">${{ product.inventory.first.price }}</p>
+                                        <button class="button button--primary add-to-cart-btn-itemlist" data-product-slug="{{ product.slug }}">
+                                            <i class="fa-solid fa-cart-shopping"></i>
+                                            <span>Add</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </a>
                     </div>
                 {% empty %}
                     No products
