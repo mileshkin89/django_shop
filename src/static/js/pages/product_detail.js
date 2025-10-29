@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const increaseBtn = quantityCounter.querySelector('[data-action="increase"]');
             const quantityValueSpan = quantityCounter.querySelector('.quantity-value');
             let quantity = 0;
-            let status = null;
 
             const slugElement = document.querySelector('[data-product-slug]');
             if (!slugElement) {
@@ -37,15 +36,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
+            function fetchItemQuantity() {
+                fetch(`/cart/cart_item/?slug=${slug}`, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    quantity = data.quantity || 0;
+                    updateView(quantity);
+                })
+                .catch(err => console.error('Error fetching initial quantity:', err));
+            }
+
             function updateQuantity(qty) {
-                fetch('/cart/add/', {
+                fetch('/cart/cart_item/', {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': getCookie('csrftoken'),
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({ slug, quantity, status })
+                    body: JSON.stringify({ slug, quantity })
                 })
                 .then(res => {
                     if (!res.ok) {
@@ -81,17 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateQuantity(quantity);
             });
 
-            fetch(`/cart/add/?slug=${slug}&status=Cart`, {
-                method: 'GET',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                quantity = data.quantity || 0;
-                status = data.status || null;
-                updateView(quantity);
-            })
-            .catch(err => console.error('Error fetching initial quantity:', err));
+            fetchItemQuantity();
 
             updateView(quantity);
         }

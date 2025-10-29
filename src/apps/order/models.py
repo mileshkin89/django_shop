@@ -8,12 +8,12 @@ class Order(models.Model):
     user = models.ForeignKey(
         'accounts.User',
         on_delete=models.CASCADE,
-        related_name='order',
+        related_name='user_orders',
     )
     shipping_address = models.ForeignKey(
         'accounts.ShippingAddress',
         on_delete=models.RESTRICT,
-        related_name='order',
+        related_name='shipping_orders',
     )
 
     status = models.CharField(max_length=15, choices=StatusChoices.choices)
@@ -43,17 +43,17 @@ class OrderItem(models.Model):
     order = models.ForeignKey(
         'Order',
         on_delete=models.CASCADE,
-        related_name='order_item',
+        related_name='order_items',
     )
     product = models.ForeignKey(
         'catalog.Product',
         on_delete=models.CASCADE,
-        related_name='order_item',
+        related_name='product_order_items',
     )
     inventory = models.ForeignKey(
         'Inventory',
         on_delete=models.RESTRICT,
-        related_name='order_item',
+        related_name='inventory_order_items',
     )
 
     quantity = models.PositiveIntegerField(default=1)

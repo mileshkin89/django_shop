@@ -5,27 +5,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cartPageContent) {
         const cartItemsList = document.getElementById('cart-items-list');
         const cartTotalPriceElem = document.getElementById('cart-total-price');
-        const slugElement = document.querySelector('[data-product-slug]');
-        if (!slugElement) {
-            console.error('Missing data-product-slug on page');
-            return;
-        }
-        const slug = slugElement.dataset.productSlug;
         let quantity;
 
-        function updateCartTotal() {
-            let total = 0;
-            document.querySelectorAll('.cart-item').forEach(item => {
-                const priceText = item.querySelector('[data-item-total-price]').textContent;
-                if (priceText) {
-                    total += parseFloat(priceText.replace('$', ''));
-                }
-            });
+        function updateCartTotal(total) {
             if (cartTotalPriceElem) cartTotalPriceElem.textContent = `$${total.toFixed(2)}`;
         }
 
-        function updateQuantity(qty) {
-            fetch('/cart/add/', {
+        function updateQuantity(slug, quantity) {
+            fetch('/cart/cart_item/', {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
@@ -43,11 +30,54 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     quantity = data.item_quantity;
+                    updateCartTotal(data.total_price);
                 } else {
                     console.error(data.error || 'Unknown error');
                 }
             })
             .catch(err => console.error('Error adding to cart:', err));
+        }
+
+        function fetchCartTotal() {
+            fetch('/cart/total/', {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    updateCartTotal(data.total_price);
+                } else {
+                    console.error(data.error || 'Unknown error');
+                }
+            })
+            .catch(err => console.error('Error fetching cart total:', err));
+        }
+
+        function deleteItem(slug) {
+            fetch('/cart/cart_item/', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ slug })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Server returned ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    updateCartTotal(data.total_price);
+                } else {
+                    console.error(data.error || 'Unknown error');
+                }
+            })
+            .catch(err => console.error('Error deleted cart item:', err));
         }
 
         if (cartItemsList) {
@@ -57,17 +87,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 const quantityElem = cartItem.querySelector('.quantity-value-cart');
                 const itemTotalElem = cartItem.querySelector('[data-item-total-price]');
                 const basePrice = parseFloat(cartItem.dataset.price);
+                const itemSlug = cartItem.dataset.productSlug;
                 quantity = parseInt(quantityElem.textContent);
+
                 if (event.target.closest('[data-action="increase"]')) {
                     quantity++;
-                    updateQuantity(quantity);
-                    updateCartTotal();
+                    updateQuantity(itemSlug, quantity);
                 } else if (event.target.closest('[data-action="decrease"]')) {
                     quantity = quantity > 1 ? quantity - 1 : 0;
-                    updateQuantity(quantity);
-                    updateCartTotal();
+                    if (quantity === 0) {
+                        deleteItem(itemSlug);
+                        cartItem.remove();
+                    } else {
+                        updateQuantity(itemSlug, quantity);
+                    }
                 }
-                if (event.target.closest('[data-action="remove"]') || quantity === 0) {
+                if (event.target.closest('[data-action="remove"]')) {
+                    deleteItem(itemSlug);
                     cartItem.remove();
                 } else {
                     quantityElem.textContent = quantity;
@@ -76,16 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        fetch(`/cart/add/?slug=${slug}`, {
-                method: 'GET',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                quantity = data.quantity || 0;
-            })
-            .catch(err => console.error('Error fetching initial quantity:', err));
-
-        updateCartTotal();
+        fetchCartTotal();
     }
 })

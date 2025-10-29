@@ -6,12 +6,12 @@ class Review(models.Model):
     user = models.ForeignKey(
         'accounts.User',
         on_delete=models.CASCADE,
-        related_name='review',
+        related_name='user_review',
     )
     product = models.ForeignKey(
         'catalog.Product',
         on_delete=models.CASCADE,
-        related_name='review',
+        related_name='product_review',
     )
 
     rating = models.PositiveSmallIntegerField(

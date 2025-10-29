@@ -21,7 +21,7 @@
 
             <div class="cart-items-list" id="cart-items-list">
 
-                {% for item in order_items %}
+                {% for item in cart_items %}
 
                     <div class="cart-item" data-price="{{ item.inventory.price }}" data-product-slug="{{ item.product.slug }}">
                         <img src="{{ item.product.image_url }}" alt="{{ item.product.product_display_name }}" class="cart-item__image">
@@ -29,12 +29,12 @@
                         <div class="cart-item__body">
                             <div class="cart-item__details">
                                 <h2 class="cart-item__name">{{ item.product.product_display_name }}</h2>
+                                <p>${{ item.inventory.price }} per set</p>
                                 <div class="cart-item__price-info">
                                     <p class="cart-item__price" data-item-total-price>
                                         ${{ item.total_price_items }}
                                     </p>
-                                    <p>{{ item.order.status }}</p>
-                                    <span class="cart-item__price-tag">per set</span>
+
                                 </div>
                             </div>
 
