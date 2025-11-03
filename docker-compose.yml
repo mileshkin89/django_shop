@@ -4,12 +4,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DJANGO_DEBUG: "true"
     container_name: django-store
     command: [ "run-django-dev.sh" ]
     env_file:
       - .env
     environment:
       - LOG_LEVEL=debug
+      - DJANGO_DEBUG=true
     volumes:
       - ./src:/usr/src/clothing-store/
       - ./datasets:/usr/src/datasets:ro

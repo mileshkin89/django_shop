@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
+import socket
 import warnings
 from pathlib import Path
 
@@ -18,8 +19,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Project data paths
 DATASETS_DIR_ENV = os.getenv('DATASETS_DIR')
-# DATASETS_DIR_ENV = BASE_DIR.parent / "datasets"
-# DATABASE_DIR = BASE_DIR.parent / "database"
 
 if not DATASETS_DIR_ENV:
     warnings.warn(
@@ -42,10 +41,30 @@ else:
 SECRET_KEY = 'django-insecure-(=4uy1mox-z16#g4^(_s*m8nvcohy^n#8@dcnfdltqez5vqo$5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "false").lower() == "true"
 
-ALLOWED_HOSTS = []
+# Hosts
+if DEBUG:
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = []
 
+# Django Debug Toolbar configuration for Docker
+if DEBUG:
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [
+        "127.0.0.1",
+        "localhost",
+    ]
+    INTERNAL_IPS.extend([ip[:-1] + "1" for ip in ips])
+    INTERNAL_IPS.extend(ips)
+
+    # Force panel to show if DEBUG is enabled (for Docker)
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+    }
+else:
+    INTERNAL_IPS = ["127.0.0.1", "localhost"]
 
 # Application definition
 
@@ -57,6 +76,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Pypi third apps
+    'django_extensions',
+    'debug_toolbar',
+
+    # Project apps
     'apps.catalog',
     'apps.accounts',
     'apps.order',
@@ -70,6 +94,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+
+    # Debug toolbar
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -181,7 +209,7 @@ USE_TZ = True
 
 APP_DIRS=True
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / "staticfiles"
 

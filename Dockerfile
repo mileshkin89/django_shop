@@ -14,6 +14,8 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=off
 
+ARG DJANGO_DEBUG=false
+
 # Installing dependencies
 RUN apt update && apt install -y \
     gcc \
@@ -38,7 +40,7 @@ ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 ENV UV_PROJECT_ENVIRONMENT=$VIRTUAL_ENV
 RUN uv venv "${VIRTUAL_ENV}" && \
-    uv sync --frozen --no-dev && \
+    uv sync --frozen $(if [ "${DJANGO_DEBUG}" = "true" ]; then echo "--dev"; fi) && \
     ln -sf /opt/venv/bin/python3 /usr/bin/python3 && \
     ln -sf /opt/venv/bin/python3 /usr/bin/python
 
