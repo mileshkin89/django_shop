@@ -16,28 +16,32 @@ Follow these steps to set up and run the application:
     uv sync
     ```
 
-3.  **Build Docker containers**: This command builds the necessary Docker images for the application services.
+3.  **Configure environment variables**:
+    - Copy `.env.sample` to `.env` and fill in the necessary information.
+    - Copy `services/pgbouncer/.env.sample` to `services/pgbouncer/.env` and fill in the necessary information.
+
+4.  **Build Docker containers**: This command builds the necessary Docker images for the application services.
     ```bash
     make build
     ```
 
-4.  **Start all services**: This will start the Docker containers in detached mode.
+5.  **Start all services**: This will start the Docker containers in detached mode.
     ```bash
     make up
     ```
     The application will be accessible at `http://localhost:8000/`.
 
-5.  **Run Django migrations**: Apply database migrations to set up the database schema.
+6.  **Run Django migrations**: Apply database migrations to set up the database schema.
     ```bash
     make migrate
     ```
 
-6.  **Seed the database with test data (Optional)**: Populate the database with sample users, catalog items, inventories, ratings, and favorites.
+7.  **Seed the database with test data (Optional)**: Populate the database with sample users, catalog items, inventories, ratings, and favorites.
     ```bash
     make seed-all
     ```
 
-7.  **Create a Django admin superuser (Optional)**: Create an admin user for the Django administration panel.
+8.  **Create a Django admin superuser (Optional)**: Create an admin user for the Django administration panel.
     ```bash
     make create-admin
     ```

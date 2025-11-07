@@ -14,6 +14,8 @@ import socket
 import warnings
 from pathlib import Path
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -32,7 +34,6 @@ else:
     DATASETS_DIR = Path(DATASETS_DIR_ENV)
     IMAGES_DATASET_CSV = DATASETS_DIR / 'images.csv'
     PRODUCTS_DATASET_CSV = DATASETS_DIR / 'products.csv'
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -123,7 +124,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -172,7 +172,6 @@ else:
         }
     }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -191,7 +190,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -203,11 +201,10 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-APP_DIRS=True
+APP_DIRS = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
@@ -230,3 +227,10 @@ AUTHENTICATION_BACKENDS = [
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME')
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 ADMIN_EMAIL = os.getenv('ADMIN_EMAIL')
+
+# Where to redirect after successful login
+LOGIN_REDIRECT_URL = reverse_lazy('catalog:home')
+# Where to redirect after successful logout
+LOGOUT_REDIRECT_URL = reverse_lazy('catalog:home')
+# URL for login page
+LOGIN_URL = reverse_lazy('accounts:login')

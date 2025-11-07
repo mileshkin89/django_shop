@@ -10,6 +10,7 @@ from django.http import QueryDict
 
 from .models import Order, OrderItem, Inventory
 from apps.catalog.models import Product
+# from apps.accounts.models import ShippingAddress 
 
 
 User = get_user_model()
@@ -22,8 +23,7 @@ class OrderItemView(View):
         if request.user.is_authenticated:
             user = request.user
         else:
-            anonim_user = User.objects.get(id=201)
-            user = anonim_user
+            return JsonResponse({'quantity': 0, 'price': 0})
 
         slug = request.GET.get('slug')
         if not slug:
@@ -59,12 +59,12 @@ class OrderItemView(View):
 
     def post(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            address = request.user.shipping_address.first()
             user = request.user
+            address = user.shipping_address.first() 
         else:
-            anonim_user = User.objects.get(id=201)
-            address = anonim_user.shipping_address.first()
-            user = anonim_user
+            return JsonResponse({
+                'success': False,
+            })
 
         data = request.POST or request.body
         if isinstance(data, bytes):
@@ -95,11 +95,26 @@ class OrderItemView(View):
             if not created:
                 order_item.quantity = quantity
                 order_item.save()
+            
+            if order_item.quantity == 0:
+                order_item.delete()
 
-            order.total_price = sum(
-                item.quantity * item.inventory.price for item in order.order_items.all()
-            )
-            order.save()
+            order.refresh_from_db() # Add this line to refresh the order instance
+
+            if order.order_items.exists():
+                order.total_price = sum(
+                    item.quantity * item.inventory.price for item in order.order_items.all()
+                )
+                order.save()
+            else:
+                order.delete()
+
+                return JsonResponse({
+                    'success': True,
+                    'order_id': None,
+                    'total_price': 0.00,
+                    'item_quantity': 0,
+                })
 
         return JsonResponse({
             'success': True,
@@ -112,8 +127,9 @@ class OrderItemView(View):
         if request.user.is_authenticated:
             user = request.user
         else:
-            anonim_user = User.objects.get(id=201)
-            user = anonim_user
+            return JsonResponse({
+                'success': False,
+            })
 
         order = (
             Order.objects.filter(user=user, status="Cart")
@@ -135,6 +151,8 @@ class OrderItemView(View):
             order_item = order.order_items.filter(product__slug=slug).first()
             if order_item:
                 order_item.delete()
+
+            order.refresh_from_db() # Add this line to refresh the order instance
 
             if not order.order_items.exists():
                 order.delete()
@@ -175,8 +193,9 @@ class CartTotalPriceView(View):
         if request.user.is_authenticated:
             user = request.user
         else:
-            anonim_user = User.objects.get(id=201)
-            user = anonim_user
+            return JsonResponse({
+                'success': False,
+            })
 
         order = Order.objects.filter(user=user, status="Cart").first()
 
@@ -186,3 +205,5 @@ class CartTotalPriceView(View):
             total_price = 0.00
 
         return JsonResponse({'success': True, 'total_price': total_price})
+
+

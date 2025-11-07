@@ -1,31 +1,31 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- General logic for all pages (Login/Logout Simulation) ---
-    const loginForm = document.getElementById('login-form');
-    const logoutButton = document.getElementById('logout-button');
-    function checkLoginStatus() {
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            document.body.classList.add('user-logged-in');
-        } else {
-            document.body.classList.remove('user-logged-in');
-        }
-    }
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            localStorage.setItem('isLoggedIn', 'true');
-            const nextUrl = new URLSearchParams(window.location.search).get('next');
-            window.location.href = nextUrl || 'home.html';
-        });
-    }
-    if (logoutButton) {
-        logoutButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('isLoggedIn');
-            window.location.href = 'home.html';
-        });
-    }
-    checkLoginStatus();
+    // // --- General logic for all pages (Login/Logout Simulation) ---
+    // const loginForm = document.getElementById('login-form');
+    // const logoutButton = document.getElementById('logout-button');
+    // function checkLoginStatus() {
+    //     if (localStorage.getItem('isLoggedIn') === 'true') {
+    //         document.body.classList.add('user-logged-in');
+    //     } else {
+    //         document.body.classList.remove('user-logged-in');
+    //     }
+    // }
+    // if (loginForm) {
+    //     loginForm.addEventListener('submit', function(e) {
+    //         e.preventDefault();
+    //         localStorage.setItem('isLoggedIn', 'true');
+    //         const nextUrl = new URLSearchParams(window.location.search).get('next');
+    //         // window.location.href = nextUrl || 'home.html';
+    //     });
+    // }
+    // if (logoutButton) {
+    //     logoutButton.addEventListener('click', function(e) {
+    //         e.preventDefault();
+    //         localStorage.removeItem('isLoggedIn');
+    //         // window.location.href = 'home.html';
+    //     });
+    // }
+    // checkLoginStatus();
 
 
     // --- Logic for the Main Page (home.html) ---
@@ -94,35 +94,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- Logic for Account and Admin Pages ---
-    const accountAdminWrapper = document.querySelector('.account-page-wrapper, .admin-page-wrapper');
-    if (accountAdminWrapper) {
-        // Account Page Tabs
-        const accountTabs = document.querySelectorAll('.account-tab');
-        const tabPanes = document.querySelectorAll('.tab-pane');
-        if (accountTabs.length > 0 && tabPanes.length > 0) {
-            accountTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    accountTabs.forEach(item => item.classList.remove('active'));
-                    tabPanes.forEach(pane => pane.classList.remove('active'));
-                    const targetPane = document.querySelector(this.dataset.tabTarget);
-                    this.classList.add('active');
-                    if (targetPane) targetPane.classList.add('active');
-                });
-            });
-        }
+    // // --- Logic for Account and Admin Pages ---
+    // const accountAdminWrapper = document.querySelector('.account-page-wrapper, .admin-page-wrapper');
+    // if (accountAdminWrapper) {
+    //     // Account Page Tabs
+    //     const accountTabs = document.querySelectorAll('.account-tab');
+    //     const tabPanes = document.querySelectorAll('.tab-pane');
+    //     if (accountTabs.length > 0 && tabPanes.length > 0) {
+    //         accountTabs.forEach(tab => {
+    //             tab.addEventListener('click', function() {
+    //                 accountTabs.forEach(item => item.classList.remove('active'));
+    //                 tabPanes.forEach(pane => pane.classList.remove('active'));
+    //                 const targetPane = document.querySelector(this.dataset.tabTarget);
+    //                 this.classList.add('active');
+    //                 if (targetPane) targetPane.classList.add('active');
+    //             });
+    //         });
+    //     }
 
-        // Admin Panel - Category Tags
-        const categoryTagsContainer = document.querySelector('.category-tags');
-        if (categoryTagsContainer) {
-            categoryTagsContainer.addEventListener('click', function(e) {
-                const clickedTag = e.target.closest('.category-tag');
-                if (clickedTag) {
-                    categoryTagsContainer.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
-                    clickedTag.classList.add('active');
-                }
-            });
-        }
+        // // Admin Panel - Category Tags
+        // const categoryTagsContainer = document.querySelector('.category-tags');
+        // if (categoryTagsContainer) {
+        //     categoryTagsContainer.addEventListener('click', function(e) {
+        //         const clickedTag = e.target.closest('.category-tag');
+        //         if (clickedTag) {
+        //             categoryTagsContainer.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+        //             clickedTag.classList.add('active');
+        //         }
+        //     });
+        // }
 
         // Image Upload Simulation
         const uploadButton = document.getElementById('upload-image-btn');
@@ -149,5 +149,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-    }
+    // }
 });

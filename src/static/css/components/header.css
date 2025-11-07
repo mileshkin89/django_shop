@@ -38,10 +38,11 @@ header {
 }
 
 .header__auth-buttons {
-    width: 192px;
+    width: 300px;
     display: flex;
     align-items: center;
     gap: 12px;
+    padding-left: 28px;
 }
 
 .button {
@@ -81,7 +82,7 @@ header {
 }
 
 .header__nav ul {
-  width: 640px;
+  width: 560px;
   font-size: 20px;
   list-style: none;
   margin: 0;

@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cartPageContent) {
         const cartItemsList = document.getElementById('cart-items-list');
         const cartTotalPriceElem = document.getElementById('cart-total-price');
+        const cartSummaryElem = document.querySelector('.cart-summary'); 
         let quantity;
 
         function updateCartTotal(total) {
@@ -30,7 +31,15 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     quantity = data.item_quantity;
-                    updateCartTotal(data.total_price);
+                    if (data.order_id === null) {
+                        cartItemsList.innerHTML = '<p class="cart-empty-message">Cart is empty</p>';
+                        if (cartSummaryElem) {
+                            cartSummaryElem.style.display = 'none';
+                        }
+                        updateCartTotal(0.00);
+                    } else {
+                        updateCartTotal(data.total_price);
+                    }
                 } else {
                     console.error(data.error || 'Unknown error');
                 }
@@ -46,7 +55,15 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    updateCartTotal(data.total_price);
+                    if (data.total_price === 0.00) {
+                        cartItemsList.innerHTML = '<p class="cart-empty-message">Cart is empty</p>';
+                        if (cartSummaryElem) {
+                            cartSummaryElem.style.display = 'none';
+                        }
+                        updateCartTotal(0.00); 
+                    } else {
+                        updateCartTotal(data.total_price);
+                    }
                 } else {
                     console.error(data.error || 'Unknown error');
                 }
@@ -72,7 +89,15 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 if (data.success) {
-                    updateCartTotal(data.total_price);
+                    if (data.order_id === null) {
+                        cartItemsList.innerHTML = '<p class="cart-empty-message">Cart is empty</p>';
+                        if (cartSummaryElem) {
+                            cartSummaryElem.style.display = 'none';
+                        }
+                        updateCartTotal(0.00);
+                    } else {
+                        updateCartTotal(data.total_price);
+                    }
                 } else {
                     console.error(data.error || 'Unknown error');
                 }

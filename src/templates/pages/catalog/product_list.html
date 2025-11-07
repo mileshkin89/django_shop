@@ -75,6 +75,7 @@
                                 <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link">
                                     <img src="{{product.image_url}}" alt="{{ product.product_display_name }}" class="product-card__image">
                                 </a>
+
                                 <div class="product-card__info">
                                     <a href="{% url 'catalog:product_detail' product.slug %}" class="product-card-link">
                                         <h4 class="product-card__name">{{ product.product_display_name }}</h4>

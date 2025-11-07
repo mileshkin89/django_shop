@@ -1,0 +1,79 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_css %}
+    <style>
+.toast {
+    visibility: hidden;
+    min-width: 320px;
+    margin-left: -160px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 12px;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    bottom: 30px;
+    font-size: 15px;
+    opacity: 0;
+    transition: opacity 0.5s, bottom 0.5s;
+}
+.toast.show {
+    visibility: visible;
+    opacity: 1;
+    bottom: 50px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+
+{% block body_content %}
+
+    <!-- Main Content -->
+    <main class="auth-page-wrapper">
+        <div class="auth-background">
+            <img src="{% static 'img/background/pattern.jpg' %}" alt="Background pattern">
+        </div>
+        <div class="auth-form-container">
+            <div class="auth-container auth-container--login">
+                <div class="Legend">
+                    <h1 class="auth-title">Sign In</h1>
+                </div>
+
+                <form class="auth-form" id="login-form" method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    <div class="form-group">
+                        {{ form.username.label_tag }}
+                        {{ form.username }}
+                        {{ form.username.errors }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.password.label_tag }}
+                        {{ form.password }}
+                        {{ form.password.errors }}
+                    </div>
+
+                    <div class="ButtonGroup">
+                        <button type="submit" class="button button--primary">Sign In</button>
+                    </div>
+
+                    <div class="TextLink">
+                        <a href="{% url 'accounts:forgot-password' %}">Forgot password?</a>
+                    </div>
+                </form>
+
+                <p class="auth-switch">Don’t have an account? <a href="{% url 'accounts:register' %}">Sign up</a></p>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}

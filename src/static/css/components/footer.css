@@ -10,6 +10,15 @@ footer {
     gap: 48px;
 }
 
+.footer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    max-width: 1200px; /* Adjust as needed based on desired layout */
+    width: 100%;
+}
+
 .footer__hops-logo {
     width: 483.92px;
     height: 263.53px;
@@ -49,5 +58,5 @@ footer {
     font-size: 14px;
     line-height: 20px;
     color: var(--white-text);
-    align-items: center;
+    text-align: center;
 }

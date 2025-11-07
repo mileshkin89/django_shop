@@ -1,0 +1,108 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}Account{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/pages/account.js' %}"></script>
+{% endblock %}
+
+
+{% block body_content %}
+
+    <!-- Main Content -->
+    <main class="account-page-wrapper">
+        <div class="account-container">
+            <!-- Tabs Navigation -->
+            <div class="account-tabs">
+                <button class="account-tab active" data-tab-target="#order-history" data-url="{% url 'accounts:order_history' %}">Order History</button>
+                <button class="account-tab" data-tab-target="#account-info" data-url="{% url 'accounts:update_account' %}">Account Information</button>
+            </div>
+
+            <!-- Tabs Content -->
+            <div class="tab-content">
+                <!-- Order History Panel -->
+                <div id="order-history" class="tab-pane active">
+                    <div class="order-history-table">
+
+                        <!-- Table Header -->
+                        <div class="order-table-header">
+                            <div class="order-table-cell">Order Details</div>
+                            <div class="order-table-cell">Order Status</div>
+                            <div class="order-table-cell">Total</div>
+                        </div>
+
+                        <!-- Table Body -->
+                        <div class="order-table-body">
+
+                            {% for order in order_history %}
+
+                            <!-- User orders -->
+                            <div class="order-table-row">
+                                <div class="order-table-cell">
+                                    <span class="order-id">{{ order.id }}</span>
+                                    <span class="order-date">{{ order.created_at }}</span>
+                                </div>
+                                <div class="order-table-cell">
+                                    <span class="order-status">{{ order.status }}</span>
+                                </div>
+                                <div class="order-table-cell">
+                                    <span class="order-total">{{ order.total_price }}</span>
+                                </div>
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                        <!-- Pagination (simplified) -->
+                        <div class="account-pagination">
+                            <a href="#" class="pagination-link-account disabled">← Previous</a>
+                            <a href="#" class="pagination-link-account">Next →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Information Panel -->
+                <div id="account-info" class="tab-pane">
+                    <div class="account-form-container">
+                        <h2 class="account-form-title">Personal Info</h2>
+                        
+                        <form id="account-info-form" method="post">
+                            {% csrf_token %}
+                            {% if form.non_field_errors %}
+                                <div class="form-errors">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+                            {% for field in form %}
+                                <div class="checkout-form-group">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="field-error">{{ field.errors|striptags }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+
+                            <button type="submit" class="button button--primary button--full-width">Save</button>
+                        </form>
+
+                        <form action="{% url 'accounts:logout' %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="button button--secondary button--full-width" id="logout-button">
+                                Logout
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+{% endblock %}
