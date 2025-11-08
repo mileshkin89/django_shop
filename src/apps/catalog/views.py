@@ -1,4 +1,4 @@
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch, Q, Exists, OuterRef, Value, BooleanField
 from django.http import JsonResponse
 from django.utils.http import urlencode
 from django.shortcuts import get_object_or_404
@@ -7,6 +7,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from .forms import ProductForm
 from .models import Product, MasterCategory, SubCategory, ArticleType
 from django.urls import reverse_lazy, reverse
+from apps.order.models import Order, OrderItem
 
 
 
@@ -94,6 +95,23 @@ class ProductListView(ListView):
             season_slugs = [s.strip() for s in season_param.split(",") if s.strip()]
             if season_slugs:
                 queryset = queryset.filter(season__slug__in=season_slugs)
+
+        # checking the availability of a product in the user's cart
+        if self.request.user.is_authenticated:
+            cart_order = Order.objects.filter(
+                user=self.request.user,
+                status='Cart'
+            )
+            cart_items = OrderItem.objects.filter(
+                order__in=cart_order,
+                product=OuterRef('pk')
+            )
+            queryset = queryset.annotate(
+                is_in_cart=Exists(cart_items)
+            )
+        else:
+            # for unauthorized users, always False
+            queryset = queryset.annotate(is_in_cart=Value(False, output_field=BooleanField()))
 
         ordering = self.request.GET.get("ordering")
         ordering_map = {
@@ -273,6 +291,26 @@ class ProductDetailView(DetailView):
         master = product.article_type.sub_category.master_category
         sub = product.article_type.sub_category
         article = product.article_type
+
+        # checking the availability of a product in the user's cart
+        if self.request.user.is_authenticated:
+            cart_order = Order.objects.filter(
+                user=self.request.user,
+                status='Cart'
+            ).first()
+            if cart_order:
+                order_item = OrderItem.objects.filter(
+                    order=cart_order,
+                    product=product
+                ).first()
+                context['is_in_cart'] = order_item is not None
+                context['cart_quantity'] = order_item.quantity if order_item else 0
+            else:
+                context['is_in_cart'] = False
+                context['cart_quantity'] = 0
+        else:
+            context['is_in_cart'] = False
+            context['cart_quantity'] = 0
 
         context["breadcrumbs"] = [
             ("Home", reverse("catalog:home")),

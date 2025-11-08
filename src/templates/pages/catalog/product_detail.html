@@ -45,16 +45,16 @@
                         <p>{{ product.description }}</p>
                     </div>
 
-                    <div class="cart-controls" data-product-slug="{{ product.slug }}">
-                        <button class="button button--primary add-to-cart-button" id="add-to-cart-btn">
+                    <div class="cart-controls" data-product-slug="{{ product.slug }}" data-initial-quantity="{{ cart_quantity }}">
+                        <button class="button button--primary add-to-cart-button{% if is_in_cart %} is-hidden{% endif %}" id="add-to-cart-btn">
                             <i class="fa-solid fa-cart-shopping"></i>
                             <span>Add to Cart</span>
                         </button>
 
-                        <div class="quantity-counter is-hidden" id="quantity-counter">
+                        <div class="quantity-counter{% if not is_in_cart %} is-hidden{% endif %}" id="quantity-counter">
                             <button class="quantity-btn" data-action="decrease" aria-label="Decrease quantity"><i
                                     class="fa-solid fa-minus"></i></button>
-                            <span class="quantity-value">1 in cart</span>
+                            <span class="quantity-value">{{ cart_quantity }} in cart</span>
                             <button class="quantity-btn" data-action="increase" aria-label="Increase quantity"><i
                                     class="fa-solid fa-plus"></i></button>
                         </div>

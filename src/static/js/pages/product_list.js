@@ -18,49 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
         button.classList.add('is-added');
     }
 
-    // Function to check if product is in cart
-    function checkProductInCart(productItem) {
-        const button = productItem.querySelector('.add-to-cart-btn-itemlist');
-        if (!button) {
-            return;
-        }
-
-        const slug = button.dataset.productSlug;
-        if (!slug) {
-            return;
-        }
-
-        fetch(`/cart/cart_item/?slug=${slug}`, {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`Server returned ${res.status}`);
-            }
-            return res.json();
-        })
-        .then(data => {
-            // If quantity > 0, product is in cart
-            if (data.quantity && data.quantity > 0) {
-                setButtonAsAdded(button);
-            }
-        })
-        .catch(err => {
-            console.error('Error checking product in cart:', err);
-        });
-    }
-
-    // Check all products on page load
-    const productItems = document.querySelectorAll('.product-item');
-    if (productItems.length > 0) {
-        productItems.forEach(productItem => {
-            checkProductInCart(productItem);
-        });
-    }
-
     // "Add to Cart" Button for product list
     const addToCartBtnItemlist = document.querySelectorAll('.add-to-cart-btn-itemlist');
     if (addToCartBtnItemlist) {

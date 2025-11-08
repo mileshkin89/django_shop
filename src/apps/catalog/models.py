@@ -119,8 +119,8 @@ class Product(models.Model):
         'BaseColour',
         on_delete=models.RESTRICT,
         related_name='products',
-        null = True,
-        blank = True
+        null=True,
+        blank=True
     )
     season = models.ForeignKey(
         'Season',
@@ -145,4 +145,3 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('catalog:product_detail', kwargs={'slug': self.slug})
-

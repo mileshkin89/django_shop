@@ -28,7 +28,6 @@ class Order(models.Model):
             raise ValidationError({'total_price': 'Total price must be greater than 0.'})
 
     def save(self, *args, **kwargs):
-        # Run validation before saving
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -59,7 +58,7 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
 
     @property
-    def total_price_items(self):
+    def get_total_price_items(self):
         return self.inventory.price * self.quantity
 
     def __str__(self):
@@ -88,7 +87,6 @@ class Inventory(models.Model):
             raise ValidationError({'total_price': 'Total price must be greater than 0.'})
 
     def save(self, *args, **kwargs):
-        # Run validation before saving
         self.full_clean()
         super().save(*args, **kwargs)
 

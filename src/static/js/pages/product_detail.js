@@ -25,6 +25,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             const slug = slugElement.dataset.productSlug;
 
+            // Initial quantity from the data attribute (set by the server)
+            const initialQuantity = parseInt(cartControls.dataset.initialQuantity || '0', 10);
+            quantity = initialQuantity;
+
             function updateView(qty) {
                 if (qty === 0) {
                     addToCartBtn.classList.remove('is-hidden');
@@ -34,19 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     quantityCounter.classList.remove('is-hidden');
                     quantityValueSpan.textContent = `${qty} in cart`;
                 }
-            }
-
-            function fetchItemQuantity() {
-                fetch(`/cart/cart_item/?slug=${slug}`, {
-                    method: 'GET',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    quantity = data.quantity || 0;
-                    updateView(quantity);
-                })
-                .catch(err => console.error('Error fetching initial quantity:', err));
             }
 
             function updateQuantity(qty) {
@@ -92,8 +83,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 quantity++;
                 updateQuantity(quantity);
             });
-
-            fetchItemQuantity();
 
             updateView(quantity);
         }
