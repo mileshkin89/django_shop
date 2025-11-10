@@ -74,24 +74,31 @@
             </button>
         </form>
 
-        <!-- Block for unauthorized user -->
-        <div class="header__auth-buttons" id="auth-guest">
-            <a href="{% url 'accounts:login' %}" class="button button--secondary">Sign in</a>
-            <a href="{% url 'accounts:register' %}" class="button button--primary">Register</a>
-            <a href="{% url 'accounts:order_history' %}" class="user-icon" aria-label="My Account">
-                <img src="{% static 'img/icons/User_alt.svg' %}" alt="User Account">
-            </a>
-            <a href="{% url 'order:cart' %}" class="cart-icon" aria-label="Shopping Cart">
-                <img src="{% static 'img/icons/Shopping_bag.svg' %}" alt="Shopping Cart">
-            </a>
-        </div>
-
-{#        <!-- Block for authorized user -->#}
-{#        <div class="header__user-actions" id="auth-user">#}
-{#            <a href="{% url 'accounts:logout' %}" class="button button--secondary">Logout</a>#}
-{#            <a href="{% url 'accounts:order_history' %}" class="user-icon" aria-label="My Account">#}
-{#                <img src="{% static 'img/icons/User_alt.svg' %}" alt="User Account">#}
-{#            </a>#}
-{#        </div>#}
+        {% if user.is_authenticated %}
+            <!-- Block for authorized user -->
+            <div class="header__user-actions" id="auth-user">
+                <form action="{% url 'accounts:logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="button button--secondary button--logout" id="logout-button">
+                        Logout
+                    </button>
+                </form>
+                <a href="{% url 'accounts:order_history' %}" class="user-icon" aria-label="My Account">
+                    <img src="{% static 'img/icons/User_alt.svg' %}" alt="User Account">
+                </a>
+                <a href="{% url 'order:cart' %}" class="cart-icon" aria-label="Shopping Cart">
+                    <img src="{% static 'img/icons/Shopping_bag.svg' %}" alt="Shopping Cart">
+                </a>
+            </div>
+        {% else %}
+            <!-- Block for unauthorized user -->
+            <div class="header__auth-buttons" id="auth-guest">
+                <a href="{% url 'accounts:login' %}" class="button button--secondary">Sign in</a>
+                <a href="{% url 'accounts:register' %}" class="button button--primary">Register</a>
+                <a href="{% url 'order:cart' %}" class="cart-icon" aria-label="Shopping Cart">
+                    <img src="{% static 'img/icons/Shopping_bag.svg' %}" alt="Shopping Cart">
+                </a>
+            </div>
+        {% endif %}
     </div>
 </header>

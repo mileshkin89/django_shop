@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 import socket
 import warnings
+from datetime import timedelta
 from pathlib import Path
 
 from django.urls import reverse_lazy
@@ -101,6 +102,9 @@ MIDDLEWARE = [
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Order
+    'apps.order.middleware.OrderMiddleware'
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -222,6 +226,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+# ShippingAddress model
+
+DEFAULT_SHIPPING_ADDRESS="Default Shipping Address"
+
 # Settings for creating Django admin superuser
 
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME')
@@ -234,3 +242,15 @@ LOGIN_REDIRECT_URL = reverse_lazy('catalog:home')
 LOGOUT_REDIRECT_URL = reverse_lazy('catalog:home')
 # URL for login page
 LOGIN_URL = reverse_lazy('accounts:login')
+
+# Order token
+
+ORDER_TOKEN_LIFETIME = timedelta(days=90)
+
+# Cart token cookie
+
+ORDER_COOKIE_NAME = "order_token"
+ORDER_COOKIE_AGE = int(ORDER_TOKEN_LIFETIME.total_seconds())
+ORDER_COOKIE_SECURE = True
+ORDER_COOKIE_HTTPONLY = True
+ORDER_COOKIE_SAMESITE = "Lax"

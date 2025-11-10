@@ -395,56 +395,7 @@ p, h1, h2, h3, h4, h5, h6 {
 }
 
 
-/*
-========================================
-    Header User Actions (Logged-in state)
-========================================
-*/
-.header__user-actions {
-    display: none;
-    align-items: center;
-    gap: 24px;
-}
 
-.user-icon, .cart-icon {
-    display: block;
-    width: 38px;
-    height: 38px;
-}
-
-.user-icon img, .cart-icon img {
-    width: 100%;
-    height: 100%;
-}
-
-.button--logout {
-    background-color: transparent;
-    border: 1px solid var(--border-dark-grey);
-    color: var(--black-main);
-    padding: 8px 16px;
-}
-
-/*
-========================================
-    Logic for Hiding/Showing Auth Blocks
-========================================
-*/
-
-body:not(.user-logged-in) .header__user-actions {
-    display: none;
-}
-
-body:not(.user-logged-in) .header__auth-buttons {
-    display: flex;
-}
-
-body.user-logged-in .header__auth-buttons {
-    display: none;
-}
-
-body.user-logged-in .header__user-actions {
-    display: flex;
-}
 
 
 /*

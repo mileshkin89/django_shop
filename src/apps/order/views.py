@@ -10,39 +10,22 @@ from django.http import QueryDict
 
 from .models import Order, OrderItem, Inventory
 from apps.catalog.models import Product
-# from apps.accounts.models import ShippingAddress 
 
 
 User = get_user_model()
 
 class OrderItemView(View):
     def get(self, request):
-        """
-        Checking if there is an item in the cart and how much there is.
-        """
-        if request.user.is_authenticated:
-            user = request.user
-        else:
+        order = getattr(request, 'order', None)
+
+        if not order:
             return JsonResponse({'quantity': 0, 'price': 0})
 
         slug = request.GET.get('slug')
         if not slug:
             return JsonResponse({'error': 'Missing slug'}, status=400)
 
-        status = request.GET.get('status')
-        if not status:
-            status = "Cart"
-
         product = get_object_or_404(Product, slug=slug)
-
-        order = (
-            Order.objects.filter(user=user, status=status)
-            .prefetch_related('order_items')
-            .first()
-        )
-
-        if not order:
-            return JsonResponse({'quantity': 0, 'price': 0})
 
         order_item = order.order_items.filter(product=product).first()
         total_price = float(order.total_price)
@@ -58,13 +41,10 @@ class OrderItemView(View):
 
 
     def post(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            user = request.user
-            address = user.shipping_address.first() 
-        else:
-            return JsonResponse({
-                'success': False,
-            })
+        order = getattr(request, 'order', None)
+
+        if not order:
+            return JsonResponse({'error': 'No active cart found.'}, status=404)
 
         data = request.POST or request.body
         if isinstance(data, bytes):
@@ -78,13 +58,11 @@ class OrderItemView(View):
         if not inventory:
             return JsonResponse({'error': 'No inventory for this product.'}, status=400)
 
-        with transaction.atomic():
-            order, _ = Order.objects.get_or_create(
-                user=user,
-                status="Cart",
-                defaults={'shipping_address': address}
-            )
+        # Send a message to the client
+        if quantity > inventory.stock:
+            return JsonResponse({'error': 'Not enough stock for this product.'}, status=400)
 
+        with transaction.atomic():
             order_item, created = OrderItem.objects.get_or_create(
                 order=order,
                 product=product,
@@ -105,7 +83,7 @@ class OrderItemView(View):
                 order.total_price = sum(
                     item.quantity * item.inventory.price for item in order.order_items.all()
                 )
-                order.save()
+                order.save(update_fields=["total_price", "updated_at"])
             else:
                 order.delete()
 
@@ -124,18 +102,7 @@ class OrderItemView(View):
         })
 
     def delete(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            user = request.user
-        else:
-            return JsonResponse({
-                'success': False,
-            })
-
-        order = (
-            Order.objects.filter(user=user, status="Cart")
-            .prefetch_related('order_items')
-            .first()
-        )
+        order = getattr(request, 'order', None)
 
         if not order:
             return JsonResponse({'error': 'No active cart found.'}, status=404)
@@ -162,7 +129,7 @@ class OrderItemView(View):
                 order.total_price = sum(
                     item.quantity * item.inventory.price for item in order.order_items.all()
                 )
-                order.save()
+                order.save(update_fields=["total_price", "updated_at"])
                 total_price = float(order.total_price)
                 order_id = order.id
 
@@ -181,6 +148,12 @@ class OrderItemListView(ListView):
     paginate_by = 10
     PER_PAGE_ALLOWED = {"4", "10", "20"}
 
+    def get_queryset(self):
+        order = getattr(self.request, 'order', None)
+        if not order:
+            return OrderItem.objects.none()
+        return OrderItem.objects.filter(order=order).select_related('inventory', 'product')
+
     def get_paginate_by(self, queryset):
         per_page = self.request.GET.get("per_page")
         if per_page in self.PER_PAGE_ALLOWED:
@@ -190,14 +163,7 @@ class OrderItemListView(ListView):
 
 class CartTotalPriceView(View):
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            user = request.user
-        else:
-            return JsonResponse({
-                'success': False,
-            })
-
-        order = Order.objects.filter(user=user, status="Cart").first()
+        order = getattr(request, 'order', None)
 
         if order:
             total_price = float(order.total_price)
@@ -205,5 +171,3 @@ class CartTotalPriceView(View):
             total_price = 0.00
 
         return JsonResponse({'success': True, 'total_price': total_price})
-
-

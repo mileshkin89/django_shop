@@ -81,7 +81,7 @@
                                         <h4 class="product-card__name">{{ product.product_display_name }}</h4>
                                     </a>
                                     <div class="product-card__price__btn">
-                                        <p class="product-card__price">${{ product.inventory.first.price }}</p>
+                                        <p class="product-card__price">${{ product.inventory.price }}</p>
                                         <button class="button button--primary add-to-cart-btn-itemlist{% if product.is_in_cart %} is-added{% endif %}" 
                                                 data-product-slug="{{ product.slug }}"{% if product.is_in_cart %} disabled{% endif %}>
                                             <i class="fa-solid {% if product.is_in_cart %}fa-check{% else %}fa-cart-shopping{% endif %}"></i>

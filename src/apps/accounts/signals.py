@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
@@ -8,4 +9,4 @@ User = get_user_model()
 @receiver(post_save, sender=User)
 def create_shipping_address_for_new_user(sender, instance, created, **kwargs):
     if created:
-        ShippingAddress.objects.create(user=instance, shipping_address="Default Shipping Address")
+        ShippingAddress.objects.create(user=instance, shipping_address=settings.DEFAULT_SHIPPING_ADDRESS)

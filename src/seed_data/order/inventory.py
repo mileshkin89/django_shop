@@ -20,18 +20,18 @@ class InventoryGenerator(SaveInDBMixin):
         products = Product.objects.all().only("id")
 
         for product in tqdm(products.iterator(), total=Product.objects.count()):
-            price = random.randint(2, 50)
-            for j in range(random.randint(1, 3)):
-                inventory = Inventory(
-                    product=product,
-                    stock=random.randint(0, 80),
-                    price=price + 0.99 * j,
-                )
-                inventories.append(inventory)
+            price = random.randint(200, 5000) / 100
 
-                if len(inventories) >= self.batch_size:
-                    self.bulk_insert(inventories, Inventory)
-                    inventories = []
+            inventory = Inventory(
+                product=product,
+                stock=random.randint(0, 80),
+                price=price,
+            )
+            inventories.append(inventory)
+
+            if len(inventories) >= self.batch_size:
+                self.bulk_insert(inventories, Inventory)
+                inventories = []
 
         if inventories:
             self.bulk_insert(inventories, Inventory)

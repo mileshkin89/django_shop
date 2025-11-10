@@ -69,7 +69,7 @@
                         <p>Total</p>
                         <p id="cart-total-price">${{ order_items.order.total_price }}</p>
                     </div>
-                    <a href="pages/card/checkout.html" class="button button--primary button--checkout">Proceed to Checkout</a>
+{#                    <a href="{% url 'order:checkout' %}" class="button button--primary button--checkout">Proceed to Checkout</a>#}
                 </div>
             {% endif %}
         </div>

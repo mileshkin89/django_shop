@@ -94,36 +94,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // // --- Logic for Account and Admin Pages ---
-    // const accountAdminWrapper = document.querySelector('.account-page-wrapper, .admin-page-wrapper');
-    // if (accountAdminWrapper) {
-    //     // Account Page Tabs
-    //     const accountTabs = document.querySelectorAll('.account-tab');
-    //     const tabPanes = document.querySelectorAll('.tab-pane');
-    //     if (accountTabs.length > 0 && tabPanes.length > 0) {
-    //         accountTabs.forEach(tab => {
-    //             tab.addEventListener('click', function() {
-    //                 accountTabs.forEach(item => item.classList.remove('active'));
-    //                 tabPanes.forEach(pane => pane.classList.remove('active'));
-    //                 const targetPane = document.querySelector(this.dataset.tabTarget);
-    //                 this.classList.add('active');
-    //                 if (targetPane) targetPane.classList.add('active');
-    //             });
-    //         });
-    //     }
-
-        // // Admin Panel - Category Tags
-        // const categoryTagsContainer = document.querySelector('.category-tags');
-        // if (categoryTagsContainer) {
-        //     categoryTagsContainer.addEventListener('click', function(e) {
-        //         const clickedTag = e.target.closest('.category-tag');
-        //         if (clickedTag) {
-        //             categoryTagsContainer.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
-        //             clickedTag.classList.add('active');
-        //         }
-        //     });
-        // }
-
         // Image Upload Simulation
         const uploadButton = document.getElementById('upload-image-btn');
         const fileInput = document.getElementById('image-upload-input');

@@ -93,7 +93,6 @@ class UserAccountForm(forms.ModelForm):
         if password:
             user.set_password(password)
 
-        # Приводим пустой телефон к None, чтобы не нарушать уникальность пустых значений
         phone_number = self.cleaned_data.get('phone_number')
         if not phone_number:
             user.phone_number = None
@@ -101,7 +100,6 @@ class UserAccountForm(forms.ModelForm):
         if commit:
             user.save()
 
-        # Сохраним адрес доставки в связанную модель, если поле присутствует в форме
         shipping_text = self.cleaned_data.get('shipping_address')
         if shipping_text is not None:
             from .models import ShippingAddress
@@ -116,7 +114,6 @@ class UserAccountForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Инициализируем поле shipping_address текущим значением из связанной модели
         user_instance = self.instance if hasattr(self, 'instance') else None
         if user_instance and getattr(user_instance, 'pk', None):
             try:
