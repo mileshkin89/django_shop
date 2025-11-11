@@ -13,6 +13,9 @@ class OrderResolver:
     def resolve(request: HttpRequest, order_token_value: Optional[str]) -> Order:
         user = getattr(request, "user", None)
         if user and user.is_authenticated:
+            pending_order = Order.objects.filter(user=user, status='Pending').order_by('-updated_at').first()
+            if pending_order:
+                return pending_order
             return Order.get_or_create_for_user(user)
 
         if order_token_value is not None:

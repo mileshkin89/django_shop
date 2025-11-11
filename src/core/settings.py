@@ -243,9 +243,10 @@ LOGOUT_REDIRECT_URL = reverse_lazy('catalog:home')
 # URL for login page
 LOGIN_URL = reverse_lazy('accounts:login')
 
-# Order token
+# Order tokens
 
 ORDER_TOKEN_LIFETIME = timedelta(days=90)
+RESERVE_TOKEN_LIFETIME = timedelta(minutes=15)
 
 # Cart token cookie
 

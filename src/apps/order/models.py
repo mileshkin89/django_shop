@@ -1,14 +1,21 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 
 from core import settings
 from .choices import StatusChoices
-from ..accounts.models import User
+from apps.accounts.models import User
+
+TOKEN_LENGTH = 32
 
 
 def default_order_token_expiry():
     return timezone.now() + settings.ORDER_TOKEN_LIFETIME
+
+
+def set_reserve_token_expiry():
+    return timezone.now() + settings.RESERVE_TOKEN_LIFETIME
 
 
 class OrderToken(models.Model):
@@ -60,6 +67,9 @@ class Order(models.Model):
     status = models.CharField(default='Cart', max_length=15, choices=StatusChoices.choices)
     total_price = models.DecimalField(default=0, max_digits=10, decimal_places=2)
 
+    reserve_token = models.CharField(max_length=64, unique=True, db_index=True, null=True, blank=True)
+    reserve_expires_at = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -85,12 +95,47 @@ class Order(models.Model):
             ),
             models.CheckConstraint(
                 check=(
-                    (models.Q(status='Cart')) |
-                    (models.Q(status__in=['Pending', 'Paid', 'Shipped', 'Delivered', 'Completed']) & models.Q(user__isnull=False))
+                        (models.Q(status='Cart')) |
+                        (models.Q(status__in=['Pending', 'Paid', 'Shipped', 'Delivered', 'Completed']) & models.Q(
+                            user__isnull=False))
                 ),
                 name='only_authenticated_can_have_non_cart_status'
             ),
         ]
+
+    @property
+    def is_expired_reserve(self) -> bool:
+        return timezone.now() >= self.reserve_expires_at
+
+    def start_checkout(self):
+        self.status = 'Pending'
+        self.reserve_token = get_random_string(TOKEN_LENGTH)
+        self.reserve_expires_at = set_reserve_token_expiry()
+
+        for item in self.order_items.select_related('inventory'):
+            item.inventory.reserve(item.quantity)
+
+        self.save(update_fields=['status', 'reserve_token', 'reserve_expires_at', 'updated_at'])
+
+    def checkout_complete(self):
+        self.status = 'Paid'
+        self.reserve_token = None
+        self.reserve_expires_at = None
+
+        for item in self.order_items.select_related('inventory'):
+            item.inventory.release_to_paid(item.quantity)
+
+        self.save(update_fields=['status', 'reserve_token', 'reserve_expires_at'])
+
+    def checkout_cancel(self):
+        self.status = 'Cart'
+        self.reserve_token = None
+        self.reserve_expires_at = None
+
+        for item in self.order_items.select_related('inventory'):
+            item.inventory.release_to_cart(item.quantity)
+
+        self.save(update_fields=['status', 'reserve_token', 'reserve_expires_at'])
 
     @classmethod
     def get_or_create_for_user(cls, user: User):
@@ -159,6 +204,22 @@ class Inventory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def reserve(self, quantity: int):
+        if self.stock < quantity:
+            raise ValidationError("Not enough stock.")
+        self.stock -= quantity
+        self.reserved += quantity
+        self.save(update_fields=['reserved', 'stock', 'updated_at'])
+
+    def release_to_paid(self, quantity: int):
+        self.reserved = max(self.reserved - quantity, 0)
+        self.save(update_fields=['reserved', 'updated_at'])
+
+    def release_to_cart(self, quantity: int):
+        self.reserved = max(self.reserved - quantity, 0)
+        self.stock += quantity
+        self.save(update_fields=['reserved', 'stock', 'updated_at'])
+
     def clean(self):
         """Ensure total_price is positive."""
         if self.price < 0:
@@ -173,5 +234,3 @@ class Inventory(models.Model):
 
     class Meta:
         ordering = ['-stock', 'price', '-updated_at', '-created_at']
-
-

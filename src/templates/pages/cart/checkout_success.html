@@ -1,0 +1,31 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+
+{% block body_content %}
+
+    <!-- Main Content -->
+    <main class="auth-page-wrapper">
+        <div class="auth-background">
+            <img src="{% static 'img/background/pattern.jpg' %}" alt="Background pattern">
+        </div>
+        <div class="auth-form-container">
+            <div class="auth-container auth-container--login">
+                <div class="Legend">
+                    <h1 class="auth-title">Order successfully placed</h1>
+                </div>
+
+                <a href="{% url 'catalog:product_list' %}" class="button button--secondary button--back">Back to catalog</a>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}

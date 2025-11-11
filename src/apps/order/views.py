@@ -1,16 +1,19 @@
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.db import transaction
+from django.shortcuts import get_object_or_404, redirect, render
+from django.db import transaction, IntegrityError
+from django.utils import timezone
 from django.views import View
 from django.contrib.auth import get_user_model
 import json
 
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 from django.http import QueryDict
 
 from .models import Order, OrderItem, Inventory
 from apps.catalog.models import Product
-
+from ..accounts.models import ShippingAddress
 
 User = get_user_model()
 
@@ -171,3 +174,140 @@ class CartTotalPriceView(View):
             total_price = 0.00
 
         return JsonResponse({'success': True, 'total_price': total_price})
+
+
+class CheckoutStartView(LoginRequiredMixin, View):
+    def post(self, request):
+        order = getattr(request, 'order', None)
+        if not order or order.status != 'Cart':
+            messages.error(request, "No active cart found.")
+            return redirect('order:cart')
+
+        if not order.order_items.exists():
+            messages.error(request, "Cart is empty.")
+            return redirect('order:cart')
+
+        order.start_checkout()
+        return redirect('order:checkout_details')
+
+
+class CheckoutDetailsView(LoginRequiredMixin, View):
+    template_name = 'pages/cart/checkout.html'
+
+    def get(self, request):
+        """
+        Render the checkout form.
+        Ensures there is an active order with status 'Pending'.
+        """
+        order = getattr(request, 'order', None)
+        if not order or order.status != 'Pending':
+            messages.error(request, "No active order to proceed with checkout.")
+            if order:
+                order.checkout_cancel()
+            return redirect('order:cart')
+
+        if not order.order_items.exists():
+            messages.error(request, "Cart is empty.")
+            order.checkout_cancel()
+            return redirect('order:cart')
+
+        # Fetch user's existing shipping addresses
+        shipping_addresses = ShippingAddress.objects.filter(user=request.user)
+        
+        context = {
+            'order': order,
+            'user': request.user,
+            'shipping_addresses': shipping_addresses,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        """
+        Handle checkout form submission.
+        Saves shipping address and updates the user and the order.
+        """
+        order = getattr(request, 'order', None)
+        if not order or order.status != 'Pending':
+            messages.error(request, "No active order to proceed with checkout.")
+            return redirect('order:cart')
+
+        if not order.order_items.exists():
+            messages.error(request, "Cart is empty.")
+            order.checkout_cancel()
+            return redirect('order:cart')
+
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get('last_name')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        address = request.POST.get('address')
+        payment_method = request.POST.get('payment_method')
+
+        if not all([first_name, last_name, phone, email, address, payment_method]):
+            messages.error(request, "Please fill in all fields.")
+            shipping_addresses = ShippingAddress.objects.filter(user=request.user)
+            return render(request, self.template_name, {
+                'order': order,
+                'user': request.user,
+                'shipping_addresses': shipping_addresses,
+            })
+
+        user = request.user
+
+        # Validate email uniqueness for other users
+        if email != user.email:
+            if User.objects.filter(email=email).exclude(pk=user.pk).exists():
+                messages.error(request, "This email is already used by another user.")
+                shipping_addresses = ShippingAddress.objects.filter(user=request.user)
+                return render(request, self.template_name, {
+                    'order': order,
+                    'user': request.user,
+                    'shipping_addresses': shipping_addresses,
+                })
+
+        # Validate phone number uniqueness for other users
+        if phone and (not user.phone_number or phone != user.phone_number):
+            if User.objects.filter(phone_number=phone).exclude(pk=user.pk).exists():
+                messages.error(request, "This phone number is already used by another user.")
+                shipping_addresses = ShippingAddress.objects.filter(user=request.user)
+                return render(request, self.template_name, {
+                    'order': order,
+                    'user': request.user,
+                    'shipping_addresses': shipping_addresses,
+                })
+
+        try:
+            # Update user data
+            user.first_name = first_name
+            user.last_name = last_name
+            user.phone_number = phone
+            user.email = email
+            user.save(update_fields=['first_name', 'last_name', 'phone_number', 'email'])
+        except IntegrityError as e:
+            messages.error(request, "Error saving data. The email or phone number may already be in use.")
+            shipping_addresses = ShippingAddress.objects.filter(user=request.user)
+            return render(request, self.template_name, {
+                'order': order,
+                'user': request.user,
+                'shipping_addresses': shipping_addresses,
+            })
+
+        # Create or get the shipping address
+        shipping_address, created = ShippingAddress.objects.get_or_create(
+            user=user,
+            shipping_address=address,
+        )
+
+        # Save the shipping address on the order
+        order.shipping_address = shipping_address
+        order.updated_at = timezone.now()
+        order.save(update_fields=['shipping_address', 'updated_at'])
+
+        order.checkout_complete()
+
+        messages.success(request, "Order completed successfully.")
+        return redirect('order:checkout_success')
+
+
+class CheckoutSuccessView(TemplateView):
+    template_name = 'pages/cart/checkout_success.html'

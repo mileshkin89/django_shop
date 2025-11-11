@@ -69,7 +69,13 @@
                         <p>Total</p>
                         <p id="cart-total-price">${{ order_items.order.total_price }}</p>
                     </div>
-{#                    <a href="{% url 'order:checkout' %}" class="button button--primary button--checkout">Proceed to Checkout</a>#}
+
+                    <form method="post" action="{% url 'order:checkout_start' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="button button--primary button--checkout">
+                            Proceed to Checkout
+                        </button>
+                    </form>
                 </div>
             {% endif %}
         </div>

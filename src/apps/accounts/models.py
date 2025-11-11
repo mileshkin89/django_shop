@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
-
+from django_extensions.management.commands.export_emails import full_name
 
 phone_validator = RegexValidator(
     regex=r'^\+1\d{10}$',
@@ -34,6 +34,10 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
+
+    @property
+    def get_full_name(self):
+        return self.first_name + ' ' + self.last_name
 
     def __str__(self):
         return self.email
