@@ -228,7 +228,7 @@ AUTHENTICATION_BACKENDS = [
 
 # ShippingAddress model
 
-DEFAULT_SHIPPING_ADDRESS="Default Shipping Address"
+DEFAULT_SHIPPING_ADDRESS = "Default Shipping Address"
 
 # Settings for creating Django admin superuser
 

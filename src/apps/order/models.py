@@ -94,7 +94,7 @@ class Order(models.Model):
 
     @classmethod
     def get_or_create_for_user(cls, user: User):
-        order, _ = cls.objects.get_or_create(user=user)
+        order, _ = cls.objects.get_or_create(user=user, status='Cart')
         return order
 
     @classmethod

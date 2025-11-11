@@ -7,12 +7,34 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import CustomAuthenticationForm, UserRegistrationForm, UserAccountForm
 from .models import User
-from ..order.models import Order
+from apps.order.models import Order
+from apps.order.utils import merge_guest_cart_to_user_cart, get_guest_cart_from_token
+from apps.order.cookies import OrderCookieManager
 
 
 class UserLoginView(LoginView):
     template_name = 'pages/accounts/login.html'
     authentication_form = CustomAuthenticationForm
+    
+    def form_valid(self, form):
+        # Read guest cart token from cookie before authentication
+        guest_token = OrderCookieManager.get_token(self.request)
+        guest_order = None
+        
+        if guest_token:
+            guest_order = get_guest_cart_from_token(guest_token)
+        
+        # Authenticate user
+        response = super().form_valid(form)
+        
+        # After successful login, merge guest cart (if exists) into user cart
+        if guest_order and self.request.user.is_authenticated:
+            merged_order = merge_guest_cart_to_user_cart(guest_order, self.request.user)
+            if merged_order:
+                # Clear guest cart cookie after successful merge
+                OrderCookieManager.clear_token(response)
+
+        return response
 
 
 class UserLogoutView(LogoutView):

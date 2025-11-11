@@ -96,21 +96,17 @@ class ProductListView(ListView):
             if season_slugs:
                 queryset = queryset.filter(season__slug__in=season_slugs)
 
-        # checking the availability of a product in the user's cart
-        if self.request.user.is_authenticated:
-            cart_order = Order.objects.filter(
-                user=self.request.user,
-                status='Cart'
-            )
+        # checking the availability of a product in the cart
+        cart_order = getattr(self.request, 'order', None)
+        if cart_order:
             cart_items = OrderItem.objects.filter(
-                order__in=cart_order,
+                order=cart_order,
                 product=OuterRef('pk')
             )
             queryset = queryset.annotate(
                 is_in_cart=Exists(cart_items)
             )
         else:
-            # for unauthorized users, always False
             queryset = queryset.annotate(is_in_cart=Value(False, output_field=BooleanField()))
 
         ordering = self.request.GET.get("ordering")
@@ -292,22 +288,14 @@ class ProductDetailView(DetailView):
         sub = product.article_type.sub_category
         article = product.article_type
 
-        # checking the availability of a product in the user's cart
-        if self.request.user.is_authenticated:
-            cart_order = Order.objects.filter(
-                user=self.request.user,
-                status='Cart'
+        cart_order = getattr(self.request, 'order', None)
+        if cart_order:
+            order_item = OrderItem.objects.filter(
+                order=cart_order,
+                product=product
             ).first()
-            if cart_order:
-                order_item = OrderItem.objects.filter(
-                    order=cart_order,
-                    product=product
-                ).first()
-                context['is_in_cart'] = order_item is not None
-                context['cart_quantity'] = order_item.quantity if order_item else 0
-            else:
-                context['is_in_cart'] = False
-                context['cart_quantity'] = 0
+            context['is_in_cart'] = order_item is not None
+            context['cart_quantity'] = order_item.quantity if order_item else 0
         else:
             context['is_in_cart'] = False
             context['cart_quantity'] = 0
