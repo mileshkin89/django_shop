@@ -67,7 +67,7 @@
                 <div class="cart-summary">
                     <div class="cart-summary__total">
                         <p>Total</p>
-                        <p id="cart-total-price">${{ order_items.order.total_price }}</p>
+                        <p id="cart-total-price">${{ order.total_price }}</p>
                     </div>
 
                     <form method="post" action="{% url 'order:checkout_start' %}">

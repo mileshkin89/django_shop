@@ -1,22 +1,25 @@
+import json
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db import transaction, IntegrityError
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.contrib.auth import get_user_model
-import json
-
 from django.views.generic import ListView, TemplateView
 from django.http import QueryDict
 
 from .models import Order, OrderItem, Inventory
 from apps.catalog.models import Product
-from ..accounts.models import ShippingAddress
+from apps.accounts.models import ShippingAddress
+from .reserve_cleaner.decorator import clear_expired_reserves
 
 User = get_user_model()
 
+
+@method_decorator(clear_expired_reserves, name='dispatch')
 class OrderItemView(View):
     def get(self, request):
         order = getattr(request, 'order', None)
@@ -41,7 +44,6 @@ class OrderItemView(View):
                 'total_price': total_price,
             })
         return JsonResponse({'quantity': 0, 'price': 0})
-
 
     def post(self, request, *args, **kwargs):
         order = getattr(request, 'order', None)
@@ -76,11 +78,11 @@ class OrderItemView(View):
             if not created:
                 order_item.quantity = quantity
                 order_item.save()
-            
+
             if order_item.quantity == 0:
                 order_item.delete()
 
-            order.refresh_from_db() # Add this line to refresh the order instance
+            order.refresh_from_db()
 
             if order.order_items.exists():
                 order.total_price = sum(
@@ -122,7 +124,7 @@ class OrderItemView(View):
             if order_item:
                 order_item.delete()
 
-            order.refresh_from_db() # Add this line to refresh the order instance
+            order.refresh_from_db()
 
             if not order.order_items.exists():
                 order.delete()
@@ -143,6 +145,7 @@ class OrderItemView(View):
         })
 
 
+@method_decorator(clear_expired_reserves, name='dispatch')
 class OrderItemListView(ListView):
     model = OrderItem
     template_name = 'pages/cart/cart.html'
@@ -156,6 +159,12 @@ class OrderItemListView(ListView):
         if not order:
             return OrderItem.objects.none()
         return OrderItem.objects.filter(order=order).select_related('inventory', 'product')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = getattr(self.request, 'order', None)
+        context['order'] = order
+        return context
 
     def get_paginate_by(self, queryset):
         per_page = self.request.GET.get("per_page")
@@ -179,11 +188,20 @@ class CartTotalPriceView(View):
 class CheckoutStartView(LoginRequiredMixin, View):
     def post(self, request):
         order = getattr(request, 'order', None)
-        if not order or order.status != 'Cart':
+
+        if not order:
             messages.error(request, "No active cart found.")
             return redirect('order:cart')
 
-        if not order.order_items.exists():
+        # If the order is already in the "Pending" status, redirect to 'checkout_details'
+        if order.status == 'Pending':
+            return redirect('order:checkout_details')
+
+        if order.status != 'Cart':
+            messages.error(request, "No active cart found.")
+            return redirect('order:cart')
+
+        if order.is_empty:
             messages.error(request, "Cart is empty.")
             return redirect('order:cart')
 
@@ -200,20 +218,21 @@ class CheckoutDetailsView(LoginRequiredMixin, View):
         Ensures there is an active order with status 'Pending'.
         """
         order = getattr(request, 'order', None)
+
         if not order or order.status != 'Pending':
             messages.error(request, "No active order to proceed with checkout.")
             if order:
                 order.checkout_cancel()
             return redirect('order:cart')
 
-        if not order.order_items.exists():
+        if order.is_empty:
             messages.error(request, "Cart is empty.")
             order.checkout_cancel()
             return redirect('order:cart')
 
         # Fetch user's existing shipping addresses
         shipping_addresses = ShippingAddress.objects.filter(user=request.user)
-        
+
         context = {
             'order': order,
             'user': request.user,
@@ -227,11 +246,12 @@ class CheckoutDetailsView(LoginRequiredMixin, View):
         Saves shipping address and updates the user and the order.
         """
         order = getattr(request, 'order', None)
+
         if not order or order.status != 'Pending':
             messages.error(request, "No active order to proceed with checkout.")
             return redirect('order:cart')
 
-        if not order.order_items.exists():
+        if order.is_empty:
             messages.error(request, "Cart is empty.")
             order.checkout_cancel()
             return redirect('order:cart')
@@ -293,7 +313,7 @@ class CheckoutDetailsView(LoginRequiredMixin, View):
             })
 
         # Create or get the shipping address
-        shipping_address, created = ShippingAddress.objects.get_or_create(
+        shipping_address, _ = ShippingAddress.objects.get_or_create(
             user=user,
             shipping_address=address,
         )

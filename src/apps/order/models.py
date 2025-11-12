@@ -104,9 +104,14 @@ class Order(models.Model):
         ]
 
     @property
+    def is_empty(self) -> bool:
+        return not self.order_items.exists()
+
+    @property
     def is_expired_reserve(self) -> bool:
         return timezone.now() >= self.reserve_expires_at
 
+    # flow 'Cart' to 'Pending' state
     def start_checkout(self):
         self.status = 'Pending'
         self.reserve_token = get_random_string(TOKEN_LENGTH)
@@ -117,6 +122,7 @@ class Order(models.Model):
 
         self.save(update_fields=['status', 'reserve_token', 'reserve_expires_at', 'updated_at'])
 
+    # flow 'Pending' to 'Paid' state
     def checkout_complete(self):
         self.status = 'Paid'
         self.reserve_token = None
@@ -127,6 +133,7 @@ class Order(models.Model):
 
         self.save(update_fields=['status', 'reserve_token', 'reserve_expires_at'])
 
+    # flow 'Pending' to 'Cart' state
     def checkout_cancel(self):
         self.status = 'Cart'
         self.reserve_token = None
@@ -204,6 +211,7 @@ class Inventory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # flow 'Cart' to 'Pending' state
     def reserve(self, quantity: int):
         if self.stock < quantity:
             raise ValidationError("Not enough stock.")
@@ -211,10 +219,12 @@ class Inventory(models.Model):
         self.reserved += quantity
         self.save(update_fields=['reserved', 'stock', 'updated_at'])
 
+    # flow 'Pending' to 'Paid' state
     def release_to_paid(self, quantity: int):
         self.reserved = max(self.reserved - quantity, 0)
         self.save(update_fields=['reserved', 'updated_at'])
 
+    # flow 'Pending' to 'Cart' state
     def release_to_cart(self, quantity: int):
         self.reserved = max(self.reserved - quantity, 0)
         self.stock += quantity

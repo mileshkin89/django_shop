@@ -1,15 +1,18 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import CreateView, UpdateView, ListView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .forms import CustomAuthenticationForm, UserRegistrationForm, UserAccountForm
 from .models import User
 from apps.order.models import Order
 from apps.order.utils import merge_guest_cart_to_user_cart, get_guest_cart_from_token
 from apps.order.cookies import OrderCookieManager
+from apps.order.reserve_cleaner.decorator import clear_expired_reserves
 
 
 class UserLoginView(LoginView):
@@ -47,6 +50,7 @@ class UserRegistrationView(CreateView):
     success_url = reverse_lazy('accounts:login')
 
 
+@method_decorator(clear_expired_reserves, name='dispatch')
 class OrderHistoryView(LoginRequiredMixin, ListView):
     model = Order
     template_name = 'pages/accounts/account.html'
