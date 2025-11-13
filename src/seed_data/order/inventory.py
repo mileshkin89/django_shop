@@ -27,14 +27,20 @@ class InventoryGenerator(SaveInDBMixin):
                 stock=random.randint(0, 80),
                 price=price,
             )
+
+            if inventory.stock == 0:
+                product.is_active = False
+                product.save()
+
             inventories.append(inventory)
 
-            if len(inventories) >= self.batch_size:
-                self.bulk_insert(inventories, Inventory)
-                inventories = []
-
-        if inventories:
-            self.bulk_insert(inventories, Inventory)
+        #     if len(inventories) >= self.batch_size:
+        #         self.bulk_insert(inventories, Inventory)
+        #         inventories = []
+        #
+        # if inventories:
+        #     self.bulk_insert(inventories, Inventory, self.batch_size)
+        self._bulk_create(inventories, Inventory, self.batch_size)
 
 
 class InventoryCleaner(DataCleanerMixin):

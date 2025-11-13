@@ -33,12 +33,12 @@ class AddressGenerator(SaveInDBMixin):
                 )
                 addresses.append(address)
 
-            if len(addresses) >= self.batch_size:
-                self.bulk_insert(addresses, ShippingAddress)
-                addresses = []
-
-        if addresses:
-            self.bulk_insert(addresses, ShippingAddress)
+        #     if len(addresses) >= self.batch_size:
+        #         self._bulk_create(addresses, ShippingAddress)
+        #         addresses = []
+        #
+        # if addresses:
+        self._bulk_create(addresses, ShippingAddress, self.batch_size)
 
 
 class AddressCleaner(DataCleanerMixin):

@@ -106,6 +106,7 @@ class Product(models.Model):
         unique=True,
         blank=True,
     )
+    is_active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -138,7 +139,11 @@ class Product(models.Model):
     )
 
     class Meta:
-        ordering = ['-year', '-updated_at', '-created_at']
+        ordering = ['product_display_name', '-updated_at', '-created_at']
+
+    @property
+    def get_is_active(self):
+        return self.inventory.stock > 0
 
     def __str__(self):
         return self.product_display_name or f'Product {self.product_id}'

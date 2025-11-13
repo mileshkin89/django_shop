@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Sequence
 from tqdm import tqdm
 
 from django.db import transaction, IntegrityError
@@ -14,10 +14,10 @@ class SaveInDBMixin:
         self.stdout = stdout
         self.style = style
 
-    def bulk_insert(self, data: list, model):
+    def _bulk_create(self, data: list, model, batch_size: int = 5000):
         try:
             with transaction.atomic():
-                model.objects.bulk_create(data, ignore_conflicts=True)
+                model.objects.bulk_create(data, batch_size=batch_size, ignore_conflicts=True)
             if self.stdout and self.style:
                 self.stdout.write(self.style.SUCCESS(f"Saved {len(data)} rows in model {model.__name__}"))
         except IntegrityError as e:
@@ -25,6 +25,18 @@ class SaveInDBMixin:
                 self.stderr.write(self.style.ERROR(f"Insert error: {e}"))
             elif self.stdout and self.style:
                 self.stdout.write(self.style.ERROR(f"Insert error: {e}"))
+
+    def _bulk_update(self, data: list, model, fields: Sequence[str], batch_size: int = 5000):
+        try:
+            with transaction.atomic():
+                model.objects.bulk_update(data, fields=fields, batch_size=batch_size, ignore_conflicts=True)
+            if self.stdout and self.style:
+                self.stdout.write(self.style.SUCCESS(f"Saved {len(data)} rows in model {model.__name__}"))
+        except IntegrityError as e:
+            if self.stderr and self.style:
+                self.stderr.write(self.style.ERROR(f"Update error: {e}"))
+            elif self.stdout and self.style:
+                self.stdout.write(self.style.ERROR(f"Update error: {e}"))
 
 
 class DataCleanerMixin:

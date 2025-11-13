@@ -6,10 +6,11 @@ echo "Database Full Cleanup Process"
 echo "========================================="
 echo "WARNING: This will delete ALL test data from the database!"
 echo "This includes:"
-echo "  - Inventory"
-echo "  - Catalog"
-echo "  - Addresses"
-echo "  - Users"
+echo "  1. Orders"
+echo "  2. Inventory"
+echo "  3. Catalog"
+echo "  4. Addresses"
+echo "  5. Users"
 echo ""
 
 read -p "Are you sure you want to continue? Type 'yes' to confirm: " confirm
@@ -21,25 +22,31 @@ fi
 # Record start time
 START_TIME=$(date +%s)
 
-echo "Step 1: Cleaning inventory..."
+echo "Step 1: Cleaning orders..."
+echo "-----------------------------------------"
+python manage.py clean_orders --yes
+echo ""
+
+echo "Step 2: Cleaning inventory..."
 echo "-----------------------------------------"
 python manage.py clean_inventory --yes
 echo ""
 
-echo "Step 2: Cleaning catalog..."
+echo "Step 3: Cleaning catalog..."
 echo "-----------------------------------------"
 python manage.py clean_catalog --yes
 echo ""
 
-echo "Step 3: Cleaning addresses..."
+echo "Step 4: Cleaning addresses..."
 echo "-----------------------------------------"
 python manage.py clean_address --yes
 echo ""
 
-echo "Step 4: Cleaning users..."
+echo "Step 5: Cleaning users..."
 echo "-----------------------------------------"
 python manage.py clean_users --yes
 echo ""
+
 
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))

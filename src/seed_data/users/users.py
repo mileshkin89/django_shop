@@ -49,13 +49,15 @@ class UserGenerator(SaveInDBMixin):
                 user.set_password(self.password)
                 hash_password = user.password
             users.append(user)
+        #
+        #     if i % self.batch_size == 0:
+        #         self.bulk_insert(users, User)
+        #         users = []
+        #
+        # if users:
+        #     self.bulk_insert(users, User)
 
-            if i % self.batch_size == 0:
-                self.bulk_insert(users, User)
-                users = []
-
-        if users:
-            self.bulk_insert(users, User)
+        self._bulk_create(users, User, self.batch_size)
 
 
 class UserCleaner(DataCleanerMixin):

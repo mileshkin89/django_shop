@@ -6,6 +6,7 @@ from django.utils.crypto import get_random_string
 from core import settings
 from .choices import StatusChoices
 from apps.accounts.models import User
+from ..catalog.models import Product
 
 TOKEN_LENGTH = 32
 
@@ -102,6 +103,9 @@ class Order(models.Model):
                 name='only_authenticated_can_have_non_cart_status'
             ),
         ]
+
+    def get_total_price(self):
+        return sum(order_item.get_total_price_items for order_item in self.order_items.all())
 
     @property
     def is_empty(self) -> bool:
@@ -219,6 +223,10 @@ class Inventory(models.Model):
         self.reserved += quantity
         self.save(update_fields=['reserved', 'stock', 'updated_at'])
 
+        if self.stock == 0 and self.product.is_active:
+            self.product.is_active = False
+            self.product.save(update_fields=['is_active'])
+
     # flow 'Pending' to 'Paid' state
     def release_to_paid(self, quantity: int):
         self.reserved = max(self.reserved - quantity, 0)
@@ -229,6 +237,10 @@ class Inventory(models.Model):
         self.reserved = max(self.reserved - quantity, 0)
         self.stock += quantity
         self.save(update_fields=['reserved', 'stock', 'updated_at'])
+
+        if self.stock > 0 and not self.product.is_active:
+            self.product.is_active = True
+            self.product.save(update_fields=['is_active'])
 
     def clean(self):
         """Ensure total_price is positive."""
