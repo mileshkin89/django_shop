@@ -39,23 +39,24 @@
                         <div class="order-table-body">
 
                             {% for order in order_history %}
+                                {% if not order.is_empty %}
 
-                            <!-- User orders -->
-                            <div class="order-table-row">
-                                <div class="order-table-cell">
-                                    <span class="order-id">{{ order.id }}</span>
-                                    <span class="order-date">{{ order.created_at }}</span>
-                                </div>
-                                <div class="order-table-cell">
-                                    <span class="order-status">{{ order.status }}</span>
-                                </div>
-                                <div class="order-table-cell">
-                                    <span class="order-total">{{ order.total_price }}</span>
-                                </div>
-                            </div>
+                                    <!-- User orders -->
+                                    <div class="order-table-row">
+                                        <div class="order-table-cell">
+                                            <span class="order-id">{{ order.id }}</span>
+                                            <span class="order-date">{{ order.created_at }}</span>
+                                        </div>
+                                        <div class="order-table-cell">
+                                            <span class="order-status">{{ order.status }}</span>
+                                        </div>
+                                        <div class="order-table-cell">
+                                            <span class="order-total">{{ order.total_price }}</span>
+                                        </div>
+                                    </div>
 
+                                {% endif %}
                             {% endfor %}
-
                         </div>
 
                         <!-- Pagination (simplified) -->

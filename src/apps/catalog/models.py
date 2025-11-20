@@ -139,7 +139,7 @@ class Product(models.Model):
     )
 
     class Meta:
-        ordering = ['product_display_name', '-updated_at', '-created_at']
+        ordering = ['product_display_name', '-updated_at']
 
     @property
     def get_is_active(self):

@@ -8,8 +8,8 @@ from .forms import ProductForm
 from .models import Product, MasterCategory, SubCategory, ArticleType
 from django.urls import reverse_lazy, reverse
 from apps.order.models import Order, OrderItem
-
-
+from ..review.forms import ReplyForm, ReviewForm
+from ..review.models import Review
 
 
 def load_subcategories(request):
@@ -56,6 +56,7 @@ class ProductListView(ListView):
         return (
             super()
             .get_queryset()
+            .filter(is_active=True)
             .select_related(
                 "article_type",
                 "article_type__sub_category",
@@ -288,6 +289,14 @@ class ProductDetailView(DetailView):
         sub = product.article_type.sub_category
         article = product.article_type
 
+        context['review_form'] = ReviewForm()
+        context['reply_form'] = ReplyForm()
+        context['comments'] = Review.objects.filter(
+            product=product,
+            parent__isnull=True,
+            is_active=True
+        ).order_by('-created_at')
+
         cart_order = getattr(self.request, 'order', None)
         if cart_order:
             order_item = OrderItem.objects.filter(
@@ -366,5 +375,18 @@ class ProductUpdateView(UpdateView):
 
 class ProductDeleteView(DeleteView):
     model = Product
-    template_name = 'pages/catalog/product_delete.html'
+    template_name = 'pages/catalog/confirm_delete.html'
     success_url = reverse_lazy('catalog:product_list')
+
+    def test_func(self):
+        return self.request.user.is_staff  # only admin
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            "object_name": "product",
+            "object_text": self.object.product_display_name,
+            "cancel_url": self.object.get_absolute_url(),
+        })
+        return context

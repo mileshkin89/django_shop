@@ -75,7 +75,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['status', '-total_price', '-updated_at', '-created_at']
+        ordering = ['status', '-updated_at']
         constraints = [
             models.CheckConstraint(
                 check=(
@@ -190,15 +190,15 @@ class OrderItem(models.Model):
 
     quantity = models.PositiveIntegerField(default=1)
 
+    class Meta:
+        ordering = ['-inventory__price', '-quantity']
+
     @property
     def get_total_price_items(self):
         return self.inventory.price * self.quantity
 
     def __str__(self):
         return f"{self.order.user.username} - {self.order.status}"
-
-    class Meta:
-        ordering = ['-inventory__price', '-quantity']
 
 
 class Inventory(models.Model):
@@ -214,6 +214,9 @@ class Inventory(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-stock', 'price', '-updated_at']
 
     # flow 'Cart' to 'Pending' state
     def reserve(self, quantity: int):
@@ -253,6 +256,3 @@ class Inventory(models.Model):
 
     def __str__(self):
         return f"{self.product.product_display_name} - {self.stock} ps - {self.price}$"
-
-    class Meta:
-        ordering = ['-stock', 'price', '-updated_at', '-created_at']

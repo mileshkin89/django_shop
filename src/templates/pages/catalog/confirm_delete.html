@@ -1,8 +1,7 @@
-
 {% extends 'layout/base.html' %}
 {% load static %}
 
-{% block title %}{% if form.instance.slug %}Delete product{% endif %}{% endblock %}
+{% block title %}Confirm delete{% endblock %}
 
 {% block extra_css %}
 {% endblock %}
@@ -13,7 +12,11 @@
 
 {% block body_content %}
     <div class="container">
-        <h1 class="my-4">Are you sure you want to delete the {{ product.product_display_name }}</h1>
+        <h1 class="my-4">
+            Are you sure you want to delete this {{ object_name }}?
+        </h1>
+
+        <p class="text-muted">{{ object_text }}</p>
 
         <form method="post" class="mt-4">
             {% csrf_token %}
@@ -21,11 +24,11 @@
                 <button type="submit" class="btn btn-danger">
                     <i class="bi bi-trash"></i> Delete
                 </button>
-                <a href="{% url 'catalog:product_detail' product.slug %}" class="btn btn-secondary">
+
+                <a href="{{ cancel_url }}" class="btn btn-secondary">
                     <i class="bi bi-x-circle"></i> Cancel
                 </a>
             </div>
         </form>
     </div>
-
 {% endblock %}
