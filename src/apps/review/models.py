@@ -1,70 +1,72 @@
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Index, Q
+
+from apps.catalog.models import Product
 
 
-class Review(models.Model):
+class BaseReview(models.Model):
     author = models.ForeignKey(
         'accounts.User',
         on_delete=models.CASCADE,
-        related_name='user_reviews',
+        related_name='user_%(class)ss'
     )
-    product = models.ForeignKey(
-        'catalog.Product',
-        on_delete=models.CASCADE,
-        related_name='product_reviews',
-    )
-    parent = models.ForeignKey(
-        'self',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='replies'
-    )
-    rating = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
-        null=True,
-        blank=True
-    )
-    comment = models.TextField()
+    text = models.TextField()
     is_active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at', '-updated_at']
-        indexes = [
-            Index(
-                fields=['author', 'product'],
-                name='unique_root_review',
-                condition=Q(parent__isnull=True),
-            )
-        ]
+        abstract = True
+
+
+class Review(BaseReview):
+    product = models.ForeignKey(
+        'catalog.Product',
+        on_delete=models.CASCADE,
+        related_name='product_reviews',
+    )
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+    )
+
+    class Meta:
+        ordering = ['-updated_at']
 
     def __str__(self):
         return f"{self.author.username} - {self.product.product_display_name}"
 
-    def clean(self):
-        super().clean()
+    def count_reviews(self):
+        pass
 
-        if self.parent and self.parent.parent:
-            raise ValidationError('Only one level of nesting is allowed.')
+    def get_avg_rating(self):
+        pass
 
-        if self.parent is None and self.rating is None:
-            raise ValidationError('Root comments must include a rating.')
+    def count_ratings(self):
+        pass
 
-        if self.parent is not None and self.rating is not None:
-            raise ValidationError('Replies cannot have a rating.')
 
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
+class Reply(BaseReview):
+    author = models.ForeignKey(
+        'accounts.User',
+        on_delete=models.CASCADE,
+        related_name='user_replies',
+    )
+    review = models.ForeignKey(
+        'review.Review',
+        on_delete=models.CASCADE,
+        related_name='review_replies',
+    )
 
-    @property
-    def is_reply(self):
-        return self.parent is not None
+    class Meta:
+        ordering = ['-updated_at']
 
-    def get_replies(self):
-        return self.replies.filter(is_active=True).order_by('created_at')
+    def __str__(self):
+        return f"{self.review.text} - {self.text}"
+
+    def get_replies_by_product(self):
+        pass
+
+    def get_replies_by_review(self):
+        pass
+

@@ -29,7 +29,7 @@ class SaveInDBMixin:
     def _bulk_update(self, data: list, model, fields: Sequence[str], batch_size: int = 5000):
         try:
             with transaction.atomic():
-                model.objects.bulk_update(data, fields=fields, batch_size=batch_size, ignore_conflicts=True)
+                model.objects.bulk_update(data, fields=fields, batch_size=batch_size)
             if self.stdout and self.style:
                 self.stdout.write(self.style.SUCCESS(f"Saved {len(data)} rows in model {model.__name__}"))
         except IntegrityError as e:

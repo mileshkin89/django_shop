@@ -8,8 +8,8 @@ from .forms import ProductForm
 from .models import Product, MasterCategory, SubCategory, ArticleType
 from django.urls import reverse_lazy, reverse
 from apps.order.models import Order, OrderItem
-from ..review.forms import ReplyForm, ReviewForm
-from ..review.models import Review
+# from ..review.forms import ReplyForm, ReviewForm
+# from ..review.models import Review
 
 
 def load_subcategories(request):
@@ -289,13 +289,13 @@ class ProductDetailView(DetailView):
         sub = product.article_type.sub_category
         article = product.article_type
 
-        context['review_form'] = ReviewForm()
-        context['reply_form'] = ReplyForm()
-        context['comments'] = Review.objects.filter(
-            product=product,
-            parent__isnull=True,
-            is_active=True
-        ).order_by('-created_at')
+        # context['review_form'] = ReviewForm()
+        # context['reply_form'] = ReplyForm()
+        # context['comments'] = Review.objects.filter(
+        #     product=product,
+        #     parent__isnull=True,
+        #     is_active=True
+        # ).order_by('-created_at')
 
         cart_order = getattr(self.request, 'order', None)
         if cart_order:

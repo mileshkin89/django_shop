@@ -1,15 +1,17 @@
 from django.urls import path
-from . import views
+
+from . import api_views
 
 app_name = "review"
 
 urlpatterns = [
-    path('products/<slug:slug>/comment/add-comment/', views.AddCommentView.as_view(), name='add_comment'),
-    path('products/<slug:slug>/comment/<int:pk>/reply/', views.AddReplyView.as_view(), name='add_reply'),
+    path('api/products/<slug:slug>/comments/<int:pk>/', api_views.ReviewDetailAPIView.as_view(),
+         name='comment_retrieve_edit_delete'),
+    path('api/products/<slug:slug>/comments/', api_views.ReviewsListAPIView.as_view(),
+         name='comments_list_add'),
 
-    path('products/<slug:slug>/comment/<int:pk>/edit/', views.EditCommentView.as_view(), name='edit_comment'),
-    path('products/<slug:slug>/reply/<int:pk>/edit/', views.EditReplyView.as_view(), name='edit_reply'),
-
-    path('products/<slug:slug>/comment/<int:pk>/delete/', views.DeleteCommentView.as_view(), name='delete_comment'),
-    path('products/<slug:slug>/reply/<int:pk>/delete/', views.DeleteReplyView.as_view(), name='delete_reply'),
+    path('api/products/<slug:slug>/comments/<int:pk>/replies/<int:pk>/', api_views.ReplyDetailAPIView.as_view(),
+         name='reply_retrieve_edit_delete'),
+    path('api/products/<slug:slug>/comments/<int:pk>/replies/', api_views.RepliesListAPIView.as_view(),
+         name='replies_list_add'),
 ]
