@@ -65,7 +65,7 @@ class ReviewDetailAPIView(LoginRequiredMixin, PermissionMixin, APIView):
     def get_object(self):
         return get_object_or_404(
             Review,
-            pk=self.kwargs['pk'],
+            pk=self.kwargs['comment_id'],
             product=self.get_product(),
             is_active=True
         )
@@ -115,7 +115,7 @@ class RepliesListAPIView(LoginRequiredMixin, PermissionMixin, APIView):
         return get_object_or_404(
             Review,
             product=self.get_product(),
-            pk=self.kwargs['pk'],
+            pk=self.kwargs['comment_id'],
             is_active=True
         )
 
@@ -151,14 +151,14 @@ class ReplyDetailAPIView(LoginRequiredMixin, PermissionMixin, APIView):
         return get_object_or_404(
             Review,
             product=self.get_product(),
-            pk=self.kwargs['pk'],
+            pk=self.kwargs['comment_id'],
             is_active=True
         )
 
     def get_object(self):
         return get_object_or_404(
             Reply,
-            pk=self.kwargs['pk'],
+            pk=self.kwargs['reply_id'],
             review=self.get_comment(),
             is_active=True
         )
