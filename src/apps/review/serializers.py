@@ -6,6 +6,7 @@ class ReplySerializer(serializers.ModelSerializer):
     class Meta:
         model = Reply
         fields = ['id', 'author', 'review', 'text']
+        read_only_fields = ['author', 'review']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -14,3 +15,4 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['id', 'author', 'product', 'rating', 'text', 'review_replies']
+        read_only_fields = ['author', 'product']

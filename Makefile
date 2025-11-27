@@ -82,7 +82,7 @@ create-admin: ## Create Django admin superuser using environment variables
 	@echo "Admin user creation completed!"
 	@echo "========================================="
 
-clean-all: ## Remove all test data from database (favorites, ratings, inventories, catalog, users)
+clean-all: ## Remove all test data from database (ratings, inventories, catalog, users)
 	@echo "========================================="
 	@echo "Database Full Cleanup Process"
 	@echo "========================================="
@@ -94,4 +94,18 @@ clean-all: ## Remove all test data from database (favorites, ratings, inventorie
 	@docker compose --env-file $(ENV_FILE) stop db
 	@echo "========================================="
 	@echo "Database cleanup completed!"
+	@echo "========================================="
+
+test: ## Run full test suite inside Docker (starts DB, runs tests, stops DB)
+	@echo "========================================="
+	@echo "Running Test Suite"
+	@echo "========================================="
+	@echo "Starting database..."
+	@docker compose --env-file $(ENV_FILE) up -d --wait --wait-timeout 60 db
+	@echo "Testing application..."
+	@docker compose --env-file $(ENV_FILE) run --rm -e USE_PGBOUNCER=false web run-test.sh
+	@echo "Stopping database..."
+	@docker compose --env-file $(ENV_FILE) stop db
+	@echo "========================================="
+	@echo "Test suite completed!"
 	@echo "========================================="

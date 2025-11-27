@@ -10,6 +10,7 @@ echo "  2. Address"
 echo "  3. Catalog"
 echo "  4. Inventory"
 echo "  5. Orders"
+echo "  6. Reviews and Ratings"
 echo ""
 
 START_TIME=$(date +%s)
@@ -23,7 +24,7 @@ echo "Step 2: Seeding address..."
 echo "-----------------------------------------"
 python manage.py seed_address
 echo ""
-#
+
 echo "Step 3: Seeding catalog data..."
 echo "-----------------------------------------"
 python manage.py seed_catalog
@@ -37,6 +38,11 @@ echo ""
 echo "Step 5: Seeding orders..."
 echo "-----------------------------------------"
 python manage.py seed_orders
+echo ""
+
+echo "Step 6: Seeding reviews and ratings..."
+echo "-----------------------------------------"
+python manage.py seed_reviews
 echo ""
 
 

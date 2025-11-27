@@ -18,7 +18,7 @@ from pathlib import Path
 from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Project data paths
 DATASETS_DIR_ENV = os.getenv('DATASETS_DIR')
@@ -140,10 +140,11 @@ if USE_PGBOUNCER:
     PGBOUNCER_HOST = os.getenv('PGBOUNCER_HOST')
     POSTGRES_DB = os.getenv('POSTGRES_DB')
 
-    if not all([PGBOUNCER_USER, PGBOUNCER_PASSWORD, PGBOUNCER_HOST, POSTGRES_DB]):
-        raise ValueError(
-            "Missing required PgBouncer environment variables:"
-            " PGBOUNCER_USER, PGBOUNCER_PASSWORD, PGBOUNCER_HOST, POSTGRES_DB")
+    if os.environ.get("DJANGO_SETTINGS_MODULE") != "core.settings.test_settings":
+        if not all([PGBOUNCER_USER, PGBOUNCER_PASSWORD, PGBOUNCER_HOST, POSTGRES_DB]):
+            raise ValueError(
+                "Missing required PgBouncer environment variables:"
+                " PGBOUNCER_USER, PGBOUNCER_PASSWORD, PGBOUNCER_HOST, POSTGRES_DB")
 
     DATABASES = {
         'default': {
@@ -161,10 +162,11 @@ else:
     POSTGRES_HOST = os.getenv('POSTGRES_HOST')
     POSTGRES_DB = os.getenv('POSTGRES_DB')
 
-    if not all([POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_DB]):
-        raise ValueError(
-            "Missing required PostgreSQL environment variables:"
-            " POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_DB")
+    if os.environ.get("DJANGO_SETTINGS_MODULE") != "core.settings.test_settings":
+        if not all([POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_DB]):
+            raise ValueError(
+                "Missing required PostgreSQL environment variables:"
+                " POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_DB")
 
     DATABASES = {
         'default': {

@@ -1,8 +1,6 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from apps.catalog.models import Product
-
 
 class BaseReview(models.Model):
     author = models.ForeignKey(
@@ -33,17 +31,14 @@ class Review(BaseReview):
     class Meta:
         ordering = ['-updated_at']
 
+    def has_reply(self) -> bool:
+        return self.review_replies.exists()
+
+    def get_replies(self):
+        return self.review_replies.all()
+
     def __str__(self):
         return f"{self.author.username} - {self.product.product_display_name}"
-
-    def count_reviews(self):
-        pass
-
-    def get_avg_rating(self):
-        pass
-
-    def count_ratings(self):
-        pass
 
 
 class Reply(BaseReview):
@@ -63,10 +58,3 @@ class Reply(BaseReview):
 
     def __str__(self):
         return f"{self.review.text} - {self.text}"
-
-    def get_replies_by_product(self):
-        pass
-
-    def get_replies_by_review(self):
-        pass
-

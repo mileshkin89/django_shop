@@ -1,30 +1,15 @@
 from django.db.models import Prefetch, Q, Exists, OuterRef, Value, BooleanField
-from django.http import JsonResponse
 from django.utils.http import urlencode
 from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView
 
-from .forms import ProductForm
 from .models import Product, MasterCategory, SubCategory, ArticleType
 from django.urls import reverse_lazy, reverse
 from apps.order.models import Order, OrderItem
+
+
 # from ..review.forms import ReplyForm, ReviewForm
 # from ..review.models import Review
-
-
-def load_subcategories(request):
-    master_category_id = request.GET.get('master_category')
-    subcategories = SubCategory.objects.filter(master_category_id=master_category_id).order_by('name')
-    data = [{'id': sub.id, 'name': sub.name} for sub in subcategories]
-    return JsonResponse(data, safe=False)
-
-
-def load_article_types(request):
-    sub_category_id = request.GET.get('sub_category')
-    article_types = ArticleType.objects.filter(sub_category_id=sub_category_id).order_by('name')
-    data = [{'id': a.id, 'name': a.name} for a in article_types]
-    return JsonResponse(data, safe=False)
-
 
 
 class HomePageView(TemplateView):
@@ -123,7 +108,6 @@ class ProductListView(ListView):
             queryset = queryset.order_by(*ordering_map[ordering])
 
         return queryset
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -275,7 +259,6 @@ class ProductByArticleTypeListView(ProductListView):
         return context
 
 
-
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'pages/catalog/product_detail.html'
@@ -288,14 +271,6 @@ class ProductDetailView(DetailView):
         master = product.article_type.sub_category.master_category
         sub = product.article_type.sub_category
         article = product.article_type
-
-        # context['review_form'] = ReviewForm()
-        # context['reply_form'] = ReplyForm()
-        # context['comments'] = Review.objects.filter(
-        #     product=product,
-        #     parent__isnull=True,
-        #     is_active=True
-        # ).order_by('-created_at')
 
         cart_order = getattr(self.request, 'order', None)
         if cart_order:
@@ -316,77 +291,4 @@ class ProductDetailView(DetailView):
             (article.name, reverse("catalog:product_list_by_article", args=[master.slug, sub.slug, article.slug])),
             (product.product_display_name, None),
         ]
-        return context
-
-
-
-class ProductCreateView(CreateView):
-    model = Product
-    form_class = ProductForm
-    template_name = 'pages/catalog/product_add_edit.html'
-    success_url = reverse_lazy('catalog:product_detail')
-
-    def get_success_url(self):
-        return reverse_lazy(
-            "catalog:product_detail",
-            kwargs={"slug": self.object.slug}
-        )
-
-    def get_initial(self):
-        initial = super().get_initial()
-        first_master = MasterCategory.objects.first()
-        if first_master:
-            initial['master_category'] = first_master
-
-            first_sub = SubCategory.objects.filter(master_category=first_master).first()
-            if first_sub:
-                initial['sub_category'] = first_sub
-
-                first_article_type = ArticleType.objects.filter(sub_category=first_sub).first()
-                if first_article_type:
-                    initial['article_type'] = first_article_type
-
-        initial['year'] = 2025
-
-
-        return initial
-
-
-class ProductUpdateView(UpdateView):
-    model = Product
-    form_class = ProductForm
-    template_name = 'pages/catalog/product_add_edit.html'
-    success_url = reverse_lazy('catalog:product_detail')
-
-    def get_success_url(self):
-        return reverse_lazy(
-            "catalog:product_detail",
-            kwargs={"slug": self.object.slug}
-        )
-
-    def get_initial(self):
-        initial = super().get_initial()
-        product = self.get_object()
-        initial['master_category'] = product.article_type.sub_category.master_category
-        initial['sub_category'] = product.article_type.sub_category
-        initial['article_type'] = product.article_type
-        return initial
-
-
-class ProductDeleteView(DeleteView):
-    model = Product
-    template_name = 'pages/catalog/confirm_delete.html'
-    success_url = reverse_lazy('catalog:product_list')
-
-    def test_func(self):
-        return self.request.user.is_staff  # only admin
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context.update({
-            "object_name": "product",
-            "object_text": self.object.product_display_name,
-            "cancel_url": self.object.get_absolute_url(),
-        })
         return context

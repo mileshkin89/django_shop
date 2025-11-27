@@ -2,8 +2,6 @@ import random
 from typing import List
 from tqdm import tqdm
 
-from django.db import transaction
-
 from apps.accounts.models import User
 from apps.catalog.models import Product
 from apps.order.models import Order, OrderItem

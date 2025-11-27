@@ -1,3 +1,4 @@
+from _decimal import Decimal
 from django.db import models
 from django.urls import reverse
 from django_extensions.db.fields import AutoSlugField
@@ -142,11 +143,27 @@ class Product(models.Model):
         ordering = ['product_display_name', '-updated_at']
 
     @property
-    def get_is_active(self):
+    def get_is_active(self) ->bool:
         return self.inventory.stock > 0
 
-    def __str__(self):
-        return self.product_display_name or f'Product {self.product_id}'
+    def get_stock_quantity(self) ->int:
+        return self.inventory.stock
+
+    def get_price(self) -> Decimal:
+        return self.inventory.price
 
     def get_absolute_url(self):
         return reverse('catalog:product_detail', kwargs={'slug': self.slug})
+
+    def get_avg_rating(self) -> float:
+        reviews = list(self.product_reviews.all())
+        return sum(review.rating for review in reviews) / len(reviews)
+
+    def has_review(self) -> bool:
+        return self.product_reviews.exists()
+
+    def count_reviews(self) -> int:
+        return self.product_reviews.count()
+
+    def __str__(self):
+        return self.product_display_name or f'Product {self.product_id}'

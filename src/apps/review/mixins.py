@@ -25,11 +25,7 @@ class PermissionMixin:
         """
         Return True if the current user is either the object's author or a staff member.
         """
-        if self._is_staff():
-            return True
-        if self._is_user_author():
-            return True
-        return False
+        return self._is_staff() or self._is_user_author()
 
     def _is_author_product_buyer(self) -> bool:
         """
@@ -51,3 +47,4 @@ class PermissionMixin:
             author=self.request.user,
             product=self.get_product(),
         ).exists()
+

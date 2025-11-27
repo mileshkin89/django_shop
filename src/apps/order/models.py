@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
-from core import settings
+from core.settings import settings
 from .choices import StatusChoices
 from apps.accounts.models import User
 from ..catalog.models import Product
