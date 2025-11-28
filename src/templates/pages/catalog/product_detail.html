@@ -9,6 +9,12 @@
 {% block extra_js %}
     <script src="{% static 'js/utils.js' %}" defer></script>
     <script src="{% static 'js/pages/product_detail.js' %}" defer></script>
+    <script src="{% static 'js/pages/reviews.js' %}" defer></script>
+    <script>
+        const PRODUCT_SLUG = "{{ product.slug }}";
+        const CURRENT_USER_ID = {{ request.user.id|default:"null" }};
+        const IS_AUTHENTICATED = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
+    </script>
 {% endblock %}
 
 
@@ -77,14 +83,44 @@
                 </div>
             </section>
 
-            {# --- Comment Section --- #}
-            {# --- Comment addition form --- #}
+          <!-- Reviews Section -->
+            <section class="reviews-section">
+                <h2 class="reviews-title">Customer Reviews</h2>
 
-            {# --- Comments --- #}
+                <!-- Review Form -->
+                {% if request.user.is_authenticated %}
+                <div class="review-form-container">
+                    <h3>Write a Review</h3>
+                    <form id="review-form" class="review-form">
+                        <div class="form-group">
+                            <label for="review-rating">Rating:</label>
+                            <select id="review-rating" name="rating" required>
+                                <option value="">Select Rating</option>
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Very Good</option>
+                                <option value="3">3 - Good</option>
+                                <option value="2">2 - Fair</option>
+                                <option value="1">1 - Poor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="review-text">Your Review:</label>
+                            <textarea id="review-text" name="text" placeholder="Share your experience with this product..." required></textarea>
+                        </div>
+                        <button type="submit" class="button button--primary">Submit Review</button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="auth-required">
+                    <p>Please <a href="{% url 'accounts:login' %}">login</a> to write a review.</p>
+                </div>
+                {% endif %}
 
-                    {# --- Replies form --- #}
-
-                    {# --- Replies --- #}
+                <!-- Reviews List -->
+                <div id="reviews-list" class="reviews-list">
+                    <!-- Reviews will be loaded here dynamically -->
+                </div>
+            </section>
 
         </div>
     </main>

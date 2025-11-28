@@ -123,7 +123,7 @@ class ReplyDetailAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["text"], "Original reply text")
-        self.assertEqual(response.data["author"], self.user.id)
+        self.assertEqual(response.data["author"]['id'], self.user.id)
 
     def test_get_reply_authenticated(self):
         """

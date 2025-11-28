@@ -165,5 +165,10 @@ class Product(models.Model):
     def count_reviews(self) -> int:
         return self.product_reviews.count()
 
+    def has_replies(self) -> bool:
+        reviews = list(self.product_reviews.all())
+        return any([review.review_replies.exists() for review in reviews])
+
+
     def __str__(self):
         return self.product_display_name or f'Product {self.product_id}'

@@ -47,7 +47,7 @@ class ShippingAddress(models.Model):
     user = models.ForeignKey(
         'User',
         on_delete=models.CASCADE,
-        related_name='shipping_address',
+        related_name='shipping_addresses',
     )
 
     shipping_address = models.TextField(default='Temporary address', null=True, blank=True)

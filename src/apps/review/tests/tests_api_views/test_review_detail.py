@@ -129,7 +129,7 @@ class ReviewDetailAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["text"], "Original review text")
         self.assertEqual(response.data["rating"], 5)
-        self.assertEqual(response.data["author"], self.user.id)
+        self.assertEqual(response.data["author"]['id'], self.user.id)
 
     def test_get_review_authenticated(self):
         """

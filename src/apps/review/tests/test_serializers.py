@@ -38,7 +38,7 @@ class ReplySerializerTest(TestCase):
 
         self.assertEqual(data["id"], reply.id)
         self.assertEqual(data["text"], reply.text)
-        self.assertEqual(data["author"], reply.author.id)
+        self.assertEqual(data["author"]["id"], reply.author.id)
         self.assertEqual(data["review"], reply.review.id)
 
     def test_reply_serializer_read_only_fields(self):
@@ -79,7 +79,7 @@ class ReviewSerializerTest(TestCase):
         data = serializer.data
 
         self.assertEqual(data["id"], review.id)
-        self.assertEqual(data["author"], review.author.id)
+        self.assertEqual(data["author"]["id"], review.author.id)
         self.assertEqual(data["product"], review.product.id)
         self.assertEqual(data["text"], "Good product")
         self.assertEqual(data["rating"], 4)

@@ -89,9 +89,8 @@
                                     </button>
                                 </div>
                                 <p>Rating - {{ product.get_avg_rating|floatformat:1 }}</p>
-                                    {% if product.has_review %}
-                                        <p>Product has {{ product.count_reviews }} review{{ product.count_reviews|pluralize:"s" }}</p>
-                                    {% endif %}
+                                <p>Product has {{ product.count_reviews }} review{{ product.count_reviews|pluralize:"s" }}</p>
+                                {% if product.has_replies %}<p>Review has replies!</p>{% endif %}
                                 <p>{{ product.get_stock_quantity }} set{{ product.get_stock_quantity|pluralize:"s" }} available</p>
                             </div>
                         </div>

@@ -245,7 +245,7 @@ class RepliesListAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["text"], "New reply from authenticated user")
-        self.assertEqual(response.data["author"], self.user.id)
+        self.assertEqual(response.data["author"]['id'], self.user.id)
 
         # Verify the reply was created in database
         self.assertEqual(Reply.objects.count(), initial_count + 1)
@@ -267,7 +267,7 @@ class RepliesListAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["text"], "Staff user reply")
-        self.assertEqual(response.data["author"], self.staff.id)
+        self.assertEqual(response.data["author"]['id'], self.staff.id)
 
     def test_post_reply_unauthenticated_user(self):
         """

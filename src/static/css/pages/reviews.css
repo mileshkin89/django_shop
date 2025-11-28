@@ -1,0 +1,249 @@
+/* Reviews Section */
+.reviews-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.reviews-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+/* Review Form */
+.review-form-container {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.review-form-container h3 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Reviews List */
+.reviews-list {
+    space-y: 1.5rem;
+}
+
+.review-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.review-author {
+    font-weight: 600;
+    color: #333;
+}
+
+.review-rating {
+    color: #ffc107;
+    font-weight: 500;
+}
+
+.review-date {
+    color: #666;
+    font-size: 0.875rem;
+}
+
+.review-text {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.review-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.review-actions button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.review-actions button:hover {
+    background: #f8f9fa;
+}
+
+/* Reply Form */
+.reply-form {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.reply-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.reply-form-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Replies List */
+.replies-list {
+    margin-top: 1rem;
+    padding-left: 1rem;
+    border-left: 2px solid #e0e0e0;
+}
+
+.reply-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+}
+
+.reply-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.reply-author {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.875rem;
+}
+
+.reply-date {
+    color: #666;
+    font-size: 0.75rem;
+}
+
+.reply-text {
+    color: #555;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.reply-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.reply-actions button {
+    padding: 0.2rem 0.5rem;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.75rem;
+}
+
+/* Edit Forms */
+.edit-review-form,
+.edit-reply-form {
+    background: #fff3cd;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ffeaa7;
+    margin-bottom: 1rem;
+}
+
+.edit-review-form textarea,
+.edit-reply-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    resize: vertical;
+}
+
+.edit-form-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Utility Classes */
+.is-hidden {
+    display: none !important;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.text-gray {
+    color: #666;
+}
+
+/* Loading State */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Error Messages */
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border: 1px solid #f5c6cb;
+}
+
+.success-message {
+    background: #d1edff;
+    color: #155724;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border: 1px solid #c3e6cb;
+}
