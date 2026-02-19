@@ -269,3 +269,15 @@ ORDER_COOKIE_AGE = int(ORDER_TOKEN_LIFETIME.total_seconds())
 ORDER_COOKIE_SECURE = True
 ORDER_COOKIE_HTTPONLY = True
 ORDER_COOKIE_SAMESITE = "Lax"
+
+# Password reset by email
+PASSWORD_RESET_TIMEOUT = 900  # 15 minutes (in seconds)
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = os.getenv(
+        "EMAIL_BACKEND",
+        "django.core.mail.backends.smtp.EmailBackend",
+    )
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@example.com")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL

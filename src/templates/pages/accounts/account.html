@@ -92,6 +92,10 @@
                             <button type="submit" class="button button--primary button--full-width">Save</button>
                         </form>
 
+                        <p class="account-form-link">
+                            <a href="{% url 'accounts:change_password' %}">Change password</a>
+                        </p>
+
                         <form action="{% url 'accounts:logout' %}" method="post" style="display: inline;">
                             {% csrf_token %}
                             <button type="submit" class="button button--secondary button--full-width" id="logout-button">

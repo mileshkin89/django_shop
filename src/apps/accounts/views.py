@@ -1,13 +1,25 @@
-from django.contrib.auth.views import LoginView, LogoutView
-from django.http import JsonResponse
-from django.shortcuts import render
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordResetView as AuthPasswordResetView,
+    PasswordResetDoneView as AuthPasswordResetDoneView,
+    PasswordResetConfirmView as AuthPasswordResetConfirmView,
+    PasswordResetCompleteView as AuthPasswordResetCompleteView,
+)
 from django.utils.decorators import method_decorator
-from django.views import View
-from django.views.generic import CreateView, UpdateView, ListView
+from django.views.generic import CreateView, UpdateView, ListView, FormView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 
-from .forms import CustomAuthenticationForm, UserRegistrationForm, UserAccountForm
+from .forms import (
+    CustomAuthenticationForm,
+    UserRegistrationForm,
+    UserAccountForm,
+    PasswordChangeForm,
+    PasswordResetRequestForm,
+    PasswordResetConfirmForm,
+)
 from .models import User
 from apps.order.models import Order
 from apps.order.utils import merge_guest_cart_to_user_cart, get_guest_cart_from_token
@@ -57,12 +69,8 @@ class OrderHistoryView(LoginRequiredMixin, ListView):
     context_object_name = 'order_history'
 
     def get_queryset(self):
-        if self.request.user.is_authenticated:
-            user = self.request.user
-
-        queryset = Order.objects.filter(user=user).all().order_by('-created_at')
-
-        return queryset
+        user = self.request.user
+        return Order.objects.filter(user=user).order_by('-created_at')
 
 
 class UserUpdateAccountView(LoginRequiredMixin, UpdateView):
@@ -75,23 +83,49 @@ class UserUpdateAccountView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
 
-# mock password reset
-class ForgotPasswordView(View):
-    def get(self, request):
-        return render(request, 'pages/accounts/forgot_password.html')
+class PasswordChangeView(LoginRequiredMixin, FormView):
+    """View for authenticated user to change password."""
 
-    def post(self, request):
-        email = request.POST.get('email')
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return render(request, 'forgot_password.html')
+    template_name = "pages/accounts/change_password.html"
+    form_class = PasswordChangeForm
+    success_url = reverse_lazy("accounts:change_password")
 
-        new_password = 'new_password123'
-        user.set_password(new_password)
-        user.save()
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
-        return JsonResponse({
-            'success': True,
-            'message': "Your password has been reset. An email has been sent with further instructions. (Use 'new_password123' to log in)"
-        })
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Your password has been changed successfully.")
+        return super().form_valid(form)
+
+
+class PasswordResetRequestView(AuthPasswordResetView):
+    """Request password reset: user enters email, receives reset link by email."""
+
+    template_name = "pages/accounts/forgot_password.html"
+    form_class = PasswordResetRequestForm
+    email_template_name = "pages/accounts/emails/password_reset_email.html"
+    subject_template_name = "pages/accounts/emails/password_reset_subject.txt"
+    success_url = reverse_lazy("accounts:password_reset_done")
+
+
+class PasswordResetDoneView(AuthPasswordResetDoneView):
+    """Shown after reset email has been sent (no link disclosure)."""
+
+    template_name = "pages/accounts/password_reset_done.html"
+
+
+class PasswordResetConfirmView(AuthPasswordResetConfirmView):
+    """Set new password from link (uidb64 + token)."""
+
+    template_name = "pages/accounts/password_reset_confirm.html"
+    form_class = PasswordResetConfirmForm
+    success_url = reverse_lazy("accounts:password_reset_complete")
+
+
+class PasswordResetCompleteView(AuthPasswordResetCompleteView):
+    """Shown after password has been successfully reset."""
+
+    template_name = "pages/accounts/password_reset_complete.html"

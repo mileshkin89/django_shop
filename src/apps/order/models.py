@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
-from core.settings import settings
+from django.conf import settings
 from .choices import StatusChoices
 from apps.accounts.models import User
 from ..catalog.models import Product
@@ -168,7 +168,9 @@ class Order(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.user.username} - {self.status}"
+        if self.user_id:
+            return f"{self.user.username} - {self.status}"
+        return f"Order(token) - {self.status}"
 
 
 class OrderItem(models.Model):
@@ -198,7 +200,9 @@ class OrderItem(models.Model):
         return self.inventory.price * self.quantity
 
     def __str__(self):
-        return f"{self.order.user.username} - {self.order.status}"
+        if self.order.user_id:
+            return f"{self.order.user.username} - {self.order.status}"
+        return f"OrderItem - {self.order.status}"
 
 
 class Inventory(models.Model):
@@ -246,9 +250,9 @@ class Inventory(models.Model):
             self.product.save(update_fields=['is_active'])
 
     def clean(self):
-        """Ensure total_price is positive."""
+        """Ensure price is non-negative."""
         if self.price < 0:
-            raise ValidationError({'total_price': 'Total price must be greater than 0.'})
+            raise ValidationError({'price': 'Price must be greater than or equal to 0.'})
 
     def save(self, *args, **kwargs):
         self.full_clean()

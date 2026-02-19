@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
-from django_extensions.management.commands.export_emails import full_name
 
 phone_validator = RegexValidator(
     regex=r'^\+1\d{10}$',

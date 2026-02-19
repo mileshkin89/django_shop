@@ -1,4 +1,4 @@
-from _decimal import Decimal
+from decimal import Decimal
 from django.db import models
 from django.urls import reverse
 from django_extensions.db.fields import AutoSlugField
@@ -157,6 +157,8 @@ class Product(models.Model):
 
     def get_avg_rating(self) -> float:
         reviews = list(self.product_reviews.all())
+        if not reviews:
+            return 0.0
         return sum(review.rating for review in reviews) / len(reviews)
 
     def has_review(self) -> bool:

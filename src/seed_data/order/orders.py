@@ -14,7 +14,7 @@ class OrderGenerator(SaveInDBMixin):
         self.batch_size = batch_size
 
     def seed_orders(self):
-        users = list(User.objects.prefetch_related('shipping_address').all())
+        users = list(User.objects.prefetch_related('shipping_addresses').all())
 
         products = list(Product.objects.select_related('inventory').filter(is_active=True))
 
@@ -33,7 +33,7 @@ class OrderGenerator(SaveInDBMixin):
                     _status = random.choice(('Paid', 'Shipped', 'Delivered', 'Completed'))
 
                 order = Order(user=user, status=_status)
-                shipping_address = user.shipping_address.first()
+                shipping_address = user.shipping_addresses.first()
                 if shipping_address:
                     order.shipping_address = shipping_address
 
