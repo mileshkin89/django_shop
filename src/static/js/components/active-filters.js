@@ -142,7 +142,7 @@ class ActiveFilters {
         totalCount += this.renderPriceChips();
 
         this.countBadge.textContent = totalCount;
-        this.clearAllBtn.style.display = totalCount > 0 ? 'block' : 'none';
+        this.clearAllBtn.style.display = totalCount > 0 ? 'inline-flex' : 'none';
     }
 
     hasPriceFilters() {

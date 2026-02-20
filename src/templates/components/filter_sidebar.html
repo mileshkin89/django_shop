@@ -1,28 +1,27 @@
 <!-- Filter Overlay -->
-<div class="filter-overlay" id="filterOverlay"></div>
+<div class="filter-overlay" id="filterOverlay" aria-hidden="true"></div>
 
 <!-- Filter Sidebar -->
 <div class="filter-sidebar" id="filterSidebar" aria-hidden="true">
-  <div class="filter-header d-flex align-items-center justify-content-between">
-    <h5 class="mb-0">
-      <i class="fas fa-filter me-2"></i>Filters
-    </h5>
-    <button type="button" class="btn btn-sm btn-outline-secondary" id="closeSidebar" aria-label="Close">
-      <i class="fas fa-times"></i>
+  <div class="filter-header">
+    <h2 class="filter-header__title">
+      <i class="fas fa-filter filter-header__icon" aria-hidden="true"></i>
+      Filters
+    </h2>
+    <button type="button" class="filter-header__close button button--cancel" id="closeSidebar" aria-label="Close sidebar">
+      <i class="fas fa-times" aria-hidden="true"></i>
     </button>
   </div>
 
   <div class="filter-content">
-
     <!-- Gender section -->
     <div class="filter-section">
-      <button class="filter-section-toggle w-100 d-flex align-items-center justify-content-between"
-              id="genderToggleBtn" type="button" aria-expanded="false" aria-controls="genderSection">
-        <span class="fw-bold">Gender</span>
-        <i class="fas fa-chevron-down small ms-2 toggle-icon"></i>
+      <button class="filter-section-toggle" id="genderToggleBtn" type="button"
+              aria-expanded="false" aria-controls="genderSection">
+        <span class="filter-section-toggle__label">Gender</span>
+        <i class="fas fa-chevron-down toggle-icon" aria-hidden="true"></i>
       </button>
-
-      <div class="filter-section-body mt-2" id="genderSection">
+      <div class="filter-section-body" id="genderSection">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="gender_all">
           <label class="form-check-label" for="gender_all">All</label>
@@ -39,14 +38,13 @@
     </div>
 
     <!-- Season section -->
-    <div class="filter-section mt-3">
-      <button class="filter-section-toggle w-100 d-flex align-items-center justify-content-between"
-              id="seasonToggleBtn" type="button" aria-expanded="false" aria-controls="seasonSection">
-        <span class="fw-bold">Season</span>
-        <i class="fas fa-chevron-down small ms-2 toggle-icon"></i>
+    <div class="filter-section">
+      <button class="filter-section-toggle" id="seasonToggleBtn" type="button"
+              aria-expanded="false" aria-controls="seasonSection">
+        <span class="filter-section-toggle__label">Season</span>
+        <i class="fas fa-chevron-down toggle-icon" aria-hidden="true"></i>
       </button>
-
-      <div class="filter-section-body mt-2" id="seasonSection">
+      <div class="filter-section-body" id="seasonSection">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="season_all">
           <label class="form-check-label" for="season_all">All</label>
@@ -63,18 +61,17 @@
     </div>
 
     <!-- Availability section -->
-    <div class="filter-section mt-3">
-      <button class="filter-section-toggle w-100 d-flex align-items-center justify-content-between"
-              id="availabilityToggleBtn" type="button" aria-expanded="false" aria-controls="availabilitySection">
-        <span class="fw-bold">Availability</span>
-        <i class="fas fa-chevron-down small ms-2 toggle-icon"></i>
+    <div class="filter-section">
+      <button class="filter-section-toggle" id="availabilityToggleBtn" type="button"
+              aria-expanded="false" aria-controls="availabilitySection">
+        <span class="filter-section-toggle__label">Availability</span>
+        <i class="fas fa-chevron-down toggle-icon" aria-hidden="true"></i>
       </button>
-
-      <div class="filter-section-body mt-2" id="availabilitySection">
+      <div class="filter-section-body" id="availabilitySection">
         <div class="form-check availability-all">
           <input class="form-check-input" type="checkbox" id="availability_all">
           <label class="form-check-label" for="availability_all">
-            <i class="fas fa-list me-2"></i>All
+            <i class="fas fa-list" aria-hidden="true"></i>All
           </label>
         </div>
         {% for availability_value, availability_name in availability_options %}
@@ -84,105 +81,84 @@
                    {% if availability_value in selected_availability %}checked{% endif %}>
             <label class="form-check-label" for="availability_{{ availability_value|slugify }}">
               {% if availability_value == "available" %}
-                <i class="fas fa-check-circle me-2"></i>{{ availability_name }}
+                <i class="fas fa-check-circle" aria-hidden="true"></i>{{ availability_name }}
               {% elif availability_value == "out_of_stock" %}
-                <i class="fas fa-times-circle me-2"></i>{{ availability_name }}
+                <i class="fas fa-times-circle" aria-hidden="true"></i>{{ availability_name }}
               {% elif availability_value == "not_active" %}
-                <i class="fas fa-ban me-2"></i>{{ availability_name }}
+                <i class="fas fa-ban" aria-hidden="true"></i>{{ availability_name }}
               {% endif %}
             </label>
           </div>
         {% endfor %}
       </div>
     </div>
+
     <!-- Price section -->
-    <div class="filter-section mt-3">
-      <button class="filter-section-toggle w-100 d-flex align-items-center justify-content-between"
-              id="priceToggleBtn" type="button" aria-expanded="false" aria-controls="priceSection">
-        <span class="fw-bold">Price Range</span>
-        <i class="fas fa-chevron-down small ms-2 toggle-icon"></i>
+    <div class="filter-section">
+      <button class="filter-section-toggle" id="priceToggleBtn" type="button"
+              aria-expanded="false" aria-controls="priceSection">
+        <span class="filter-section-toggle__label">Price Range</span>
+        <i class="fas fa-chevron-down toggle-icon" aria-hidden="true"></i>
       </button>
-
-      <div class="filter-section-body mt-2" id="priceSection">
+      <div class="filter-section-body" id="priceSection">
         <div class="price-filter-container">
-
-          <!-- Range Slider -->
-          <div class="price-slider-container mb-3">
+          <div class="price-slider-container">
             <div class="price-slider-wrapper">
-              <input type="range" class="form-range price-range-min"
-                     id="priceRangeMin"
-                     min="{{ price_range.min }}"
-                     max="{{ price_range.max }}"
-                     value="{{ price_range.current_min }}"
-                     step="0.01">
-              <input type="range" class="form-range price-range-max"
-                     id="priceRangeMax"
-                     min="{{ price_range.min }}"
-                     max="{{ price_range.max }}"
-                     value="{{ price_range.current_max }}"
-                     step="0.01">
+              <input type="range" class="form-range price-range-min" id="priceRangeMin"
+                     min="{{ price_range.min }}" max="{{ price_range.max }}"
+                     value="{{ price_range.current_min }}" step="0.01" aria-label="Min price">
+              <input type="range" class="form-range price-range-max" id="priceRangeMax"
+                     min="{{ price_range.min }}" max="{{ price_range.max }}"
+                     value="{{ price_range.current_max }}" step="0.01" aria-label="Max price">
               <div class="price-slider-track">
                 <div class="price-slider-range"></div>
               </div>
             </div>
           </div>
 
-          <!-- Input Fields -->
-          <div class="row g-2">
-            <div class="col-6">
-              <label for="minPriceInput" class="form-label small text-muted">Min Price</label>
-              <div class="input-group input-group-sm">
-                <span class="input-group-text">$</span>
-                <input type="number"
-                       class="form-control"
-                       id="minPriceInput"
-                       min="{{ price_range.min }}"
-                       max="{{ price_range.max }}"
-                       value="{{ price_range.current_min }}"
-                       step="0.01">
+          <div class="price-inputs-row">
+            <div class="price-input-group">
+              <label for="minPriceInput" class="form-label">Min Price</label>
+              <div class="price-input-wrap">
+                <span class="price-input-prefix">$</span>
+                <input type="number" class="form-control Input" id="minPriceInput"
+                       min="{{ price_range.min }}" max="{{ price_range.max }}"
+                       value="{{ price_range.current_min }}" step="0.01" aria-label="Min price">
               </div>
             </div>
-            <div class="col-6">
-              <label for="maxPriceInput" class="form-label small text-muted">Max Price</label>
-              <div class="input-group input-group-sm">
-                <span class="input-group-text">$</span>
-                <input type="number"
-                       class="form-control"
-                       id="maxPriceInput"
-                       min="{{ price_range.min }}"
-                       max="{{ price_range.max }}"
-                       value="{{ price_range.current_max }}"
-                       step="0.01">
+            <div class="price-input-group">
+              <label for="maxPriceInput" class="form-label">Max Price</label>
+              <div class="price-input-wrap">
+                <span class="price-input-prefix">$</span>
+                <input type="number" class="form-control Input" id="maxPriceInput"
+                       min="{{ price_range.min }}" max="{{ price_range.max }}"
+                       value="{{ price_range.current_max }}" step="0.01" aria-label="Max price">
               </div>
             </div>
           </div>
 
-          <!-- Current Range Display -->
-          <div class="price-display mt-2 text-center">
-            <small class="text-muted">
-              Current: <span class="fw-bold text-primary" id="currentPriceDisplay">
-                ${{ price_range.current_min }} - ${{ price_range.current_max }}
-              </span>
-            </small>
+          <div class="price-display">
+            <span class="price-display__label">Current:</span>
+            <span class="price-display__value" id="currentPriceDisplay">
+              ${{ price_range.current_min }} - ${{ price_range.current_max }}
+            </span>
           </div>
-
         </div>
       </div>
     </div>
 
     <!-- Discount section -->
-    <div class="filter-section mt-3">
-      <button class="filter-section-toggle w-100 d-flex align-items-center justify-content-between"
-              id="discountToggleBtn" type="button" aria-expanded="false" aria-controls="discountSection">
-        <span class="fw-bold">Discount</span>
-        <i class="fas fa-chevron-down small ms-2 toggle-icon"></i>
+    <div class="filter-section">
+      <button class="filter-section-toggle" id="discountToggleBtn" type="button"
+              aria-expanded="false" aria-controls="discountSection">
+        <span class="filter-section-toggle__label">Discount</span>
+        <i class="fas fa-chevron-down toggle-icon" aria-hidden="true"></i>
       </button>
-
-      <div class="filter-section-body mt-2" id="discountSection">
+      <div class="filter-section-body" id="discountSection">
         <div class="form-check discount-all">
           <input class="form-check-input" type="checkbox" id="discount_all">
           <label class="form-check-label" for="discount_all">
-            <i class="fas fa-tags me-2"></i>All
+            <i class="fas fa-tags" aria-hidden="true"></i>All
           </label>
         </div>
         {% for discount_value, discount_name in discount_options %}
@@ -192,24 +168,25 @@
                    {% if discount_value in selected_discount %}checked{% endif %}>
             <label class="form-check-label" for="discount_{{ discount_value|slugify }}">
               {% if discount_value == "on_sale" %}
-                <i class="fas fa-percentage me-2"></i>{{ discount_name }}
+                <i class="fas fa-percentage" aria-hidden="true"></i>{{ discount_name }}
               {% elif discount_value == "no_discount" %}
-                <i class="fas fa-equals me-2"></i>{{ discount_name }}
+                <i class="fas fa-equals" aria-hidden="true"></i>{{ discount_name }}
               {% endif %}
             </label>
           </div>
         {% endfor %}
       </div>
     </div>
-
   </div>
 
-  <div class="filter-footer d-flex justify-content-between">
-    <button type="button" class="btn btn-outline-secondary btn-sm" id="resetFilters">
-      <i class="fas fa-undo me-1"></i>Reset
+  <div class="filter-footer">
+    <button type="button" class="filter-footer__btn button button--cancel" id="resetFilters">
+      <i class="fas fa-undo" aria-hidden="true"></i>
+      <span>Reset</span>
     </button>
-    <button type="button" class="btn btn-primary btn-sm" id="applyFilters">
-      <i class="fas fa-search me-1"></i>Apply
+    <button type="button" class="filter-footer__btn button button--primary" id="applyFilters">
+      <i class="fas fa-search" aria-hidden="true"></i>
+      <span>Apply</span>
     </button>
   </div>
 </div>

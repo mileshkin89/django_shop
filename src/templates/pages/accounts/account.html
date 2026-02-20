@@ -60,10 +60,12 @@
                         </div>
 
                         <!-- Pagination (simplified) -->
+                        {% if order_history|length > 10 %}
                         <div class="account-pagination">
-                            <a href="#" class="pagination-link-account disabled">← Previous</a>
-                            <a href="#" class="pagination-link-account">Next →</a>
+                            <a href="#" class="pagination-link-account disabled">Previous</a>
+                            <a href="#" class="pagination-link-account">Next</a>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -92,9 +94,7 @@
                             <button type="submit" class="button button--primary button--full-width">Save</button>
                         </form>
 
-                        <p class="account-form-link">
-                            <a href="{% url 'accounts:change_password' %}">Change password</a>
-                        </p>
+                        <a href="{% url 'accounts:change_password' %}" class="button button--secondary button--full-width">Change password</a>
 
                         <form action="{% url 'accounts:logout' %}" method="post" style="display: inline;">
                             {% csrf_token %}

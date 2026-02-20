@@ -4,6 +4,7 @@
 {% block title %}Product Detail{% endblock %}
 
 {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/reviews.css' %}">
 {% endblock %}
 
 {% block extra_js %}
@@ -35,9 +36,15 @@
                     <div class="product-title-price">
                         <h1 class="product-name">{{ product.product_display_name }}</h1>
                         <div class="price-section">
-                            <p>Rating - {{ product.get_avg_rating|floatformat:1 }}</p>
-                            <p>{{ product.get_stock_quantity }} set{{ product.get_stock_quantity|pluralize:"s" }} available</p>
-                            <span class="price-tag">for 1 set</span>
+                            <p class="product-card__rating" title="{{ product.get_avg_rating|floatformat:1 }}">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= product.get_rating_stars %}
+                                        <i class="fa-solid fa-star product-card__rating-star product-card__rating-star--filled" aria-hidden="true"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-star product-card__rating-star product-card__rating-star--empty" aria-hidden="true"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </p>
                             <p class="product-price">${{ product.get_price|floatformat:2 }}</p>
                         </div>
                     </div>
@@ -83,42 +90,40 @@
                 </div>
             </section>
 
-          <!-- Reviews Section -->
-            <section class="reviews-section">
-                <h2 class="reviews-title">Customer Reviews</h2>
+            <hr class="section-divider" aria-hidden="true">
 
-                <!-- Review Form -->
+            <section class="reviews-section" aria-labelledby="reviews-heading">
+                <h2 id="reviews-heading" class="reviews-section__title">Customer Reviews</h2>
+
                 {% if request.user.is_authenticated %}
-                <div class="review-form-container">
-                    <h3>Write a Review</h3>
-                    <form id="review-form" class="review-form">
-                        <div class="form-group">
-                            <label for="review-rating">Rating:</label>
-                            <select id="review-rating" name="rating" required>
+                <div class="reviews-section__form-wrap">
+                    <h3 class="reviews-section__form-title">Write a Review</h3>
+                    <form id="review-form" class="reviews-section__form" novalidate>
+                        <div class="reviews-section__field reviews-section__field--row">
+                            <label for="review-rating" class="reviews-section__label">Rating</label>
+                            <select id="review-rating" name="rating" class="reviews-section__select Input" required aria-required="true">
                                 <option value="">Select Rating</option>
-                                <option value="5">5 - Excellent</option>
-                                <option value="4">4 - Very Good</option>
-                                <option value="3">3 - Good</option>
-                                <option value="2">2 - Fair</option>
-                                <option value="1">1 - Poor</option>
+                                <option value="5">5 — Excellent</option>
+                                <option value="4">4 — Very Good</option>
+                                <option value="3">3 — Good</option>
+                                <option value="2">2 — Fair</option>
+                                <option value="1">1 — Poor</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="review-text">Your Review:</label>
-                            <textarea id="review-text" name="text" placeholder="Share your experience with this product..." required></textarea>
+                        <div class="reviews-section__field">
+                            <label for="review-text" class="reviews-section__label">Your Review</label>
+                            <textarea id="review-text" name="text" class="reviews-section__textarea Textarea" rows="4" placeholder="Share your experience with this product…" required aria-required="true"></textarea>
                         </div>
-                        <button type="submit" class="button button--primary">Submit Review</button>
+                        <button type="submit" class="button button--primary reviews-section__submit">Submit Review</button>
                     </form>
                 </div>
                 {% else %}
-                <div class="auth-required">
-                    <p>Please <a href="{% url 'accounts:login' %}">login</a> to write a review.</p>
-                </div>
+                <p class="reviews-section__auth-prompt">
+                    Please <a href="{% url 'accounts:login' %}" class="reviews-section__auth-link">log in</a> to write a review.
+                </p>
                 {% endif %}
 
-                <!-- Reviews List -->
-                <div id="reviews-list" class="reviews-list">
-                    <!-- Reviews will be loaded here dynamically -->
+                <div id="reviews-list" class="reviews-section__list" role="list">
                 </div>
             </section>
 

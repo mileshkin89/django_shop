@@ -146,11 +146,6 @@ class UserAccountForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'class': 'Textarea', 'placeholder': 'Value', 'rows': '3'}),
         required=False
     )
-    password = forms.CharField(
-        label="Password",
-        widget=forms.PasswordInput(attrs={'class': 'Input', 'placeholder': 'Value'}),
-        required=False
-    )
 
     class Meta:
         model = User
@@ -158,9 +153,6 @@ class UserAccountForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        password = self.cleaned_data.get('password')
-        if password:
-            user.set_password(password)
 
         phone_number = self.cleaned_data.get('phone_number')
         if not phone_number:

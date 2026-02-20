@@ -161,6 +161,10 @@ class Product(models.Model):
             return 0.0
         return sum(review.rating for review in reviews) / len(reviews)
 
+    def get_rating_stars(self) -> int:
+        rating = self.get_avg_rating()
+        return min(5, max(0, int(rating + 0.5)))
+
     def has_review(self) -> bool:
         return self.product_reviews.exists()
 

@@ -142,7 +142,7 @@ class ReviewsManager {
                 <div class="review-header">
                     <div>
                         <span class="review-author">${this.escapeHtml(authorName)}</span>
-                        <span class="review-rating">★ ${review.rating}/5</span>
+                        <span class="review-rating" data-rating="${typeof review.rating === 'number' ? review.rating : parseInt(review.rating, 10) || 0}" title="${review.rating}/5">${this.getRatingStarsHtml(review.rating)}</span>
                     </div>
                     <span class="review-date">${formattedDate}</span>
                 </div>
@@ -151,13 +151,13 @@ class ReviewsManager {
                 
                 ${canEdit ? `
                     <div class="review-actions">
-                        <button class="edit-review" data-review-id="${review.id}">Edit</button>
-                        <button class="delete-review" data-review-id="${review.id}">Delete</button>
+                        <button type="button" class="button button--slim edit-review" data-review-id="${review.id}">Edit</button>
+                        <button type="button" class="button button--slim delete-review" data-review-id="${review.id}">Delete</button>
                     </div>
                 ` : ''}
                 
                 ${this.isAuthenticated ? `
-                    <button class="show-reply-form text-sm" data-review-id="${review.id}">
+                    <button type="button" class="button button--slim show-reply-form text-sm" data-review-id="${review.id}">
                         Reply
                     </button>
                 ` : ''}
@@ -165,8 +165,8 @@ class ReviewsManager {
                 <div id="reply-form-${review.id}" class="reply-form is-hidden">
                     <textarea placeholder="Write your reply..." required></textarea>
                     <div class="reply-form-actions">
-                        <button type="submit" class="button button--primary">Submit Reply</button>
-                        <button type="button" class="cancel-reply-form">Cancel</button>
+                        <button type="submit" class="button button--primary button--slim">Submit Reply</button>
+                        <button type="button" class="button button--slim cancel-reply-form">Cancel</button>
                     </div>
                 </div>
                 
@@ -206,8 +206,8 @@ class ReviewsManager {
                 <div class="reply-text">${this.escapeHtml(reply.text)}</div>
                 ${canEdit ? `
                     <div class="reply-actions">
-                        <button class="edit-reply" data-review-id="${reviewId}" data-reply-id="${reply.id}">Edit</button>
-                        <button class="delete-reply" data-review-id="${reviewId}" data-reply-id="${reply.id}">Delete</button>
+                        <button type="button" class="button button--slim edit-reply" data-review-id="${reviewId}" data-reply-id="${reply.id}">Edit</button>
+                        <button type="button" class="button button--slim delete-reply" data-review-id="${reviewId}" data-reply-id="${reply.id}">Delete</button>
                     </div>
                 ` : ''}
             </div>
@@ -332,7 +332,7 @@ class ReviewsManager {
     showEditReviewForm(reviewId) {
         const reviewElement = document.getElementById(`review-${reviewId}`);
         const reviewText = reviewElement.querySelector('.review-text').textContent;
-        const reviewRating = reviewElement.querySelector('.review-rating').textContent.match(/\d+/)[0];
+        const reviewRating = reviewElement.querySelector('.review-rating').dataset.rating || '3';
 
         reviewElement.querySelector('.review-text').style.display = 'none';
         if (reviewElement.querySelector('.review-actions')) {
@@ -359,8 +359,8 @@ class ReviewsManager {
                     <textarea class="edit-text">${this.escapeHtml(reviewText)}</textarea>
                 </div>
                 <div class="edit-form-actions">
-                    <button class="save-edit" data-review-id="${reviewId}">Save</button>
-                    <button class="cancel-edit">Cancel</button>
+                    <button type="button" class="button button--primary button--slim save-edit" data-review-id="${reviewId}">Save</button>
+                    <button type="button" class="button button--slim cancel-edit">Cancel</button>
                 </div>
             </div>
         `;
@@ -434,8 +434,8 @@ class ReviewsManager {
                     <textarea class="edit-text">${this.escapeHtml(replyText)}</textarea>
                 </div>
                 <div class="edit-form-actions">
-                    <button class="save-edit-reply" data-review-id="${reviewId}" data-reply-id="${replyId}">Save</button>
-                    <button class="cancel-edit">Cancel</button>
+                    <button type="button" class="button button--primary button--slim save-edit-reply" data-review-id="${reviewId}" data-reply-id="${replyId}">Save</button>
+                    <button type="button" class="button button--slim cancel-edit">Cancel</button>
                 </div>
             </div>
         `;
@@ -595,6 +595,18 @@ class ReviewsManager {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    /**
+     * Returns HTML for rating as stars (★ filled, ☆ empty).
+     * rating: number 1-5 or string like "2" or "2/5" (parsed to number).
+     */
+    getRatingStarsHtml(rating) {
+        const value = typeof rating === 'string' ? parseInt(String(rating).replace(/\/.*$/, ''), 10) : Number(rating);
+        const num = Math.min(5, Math.max(0, isNaN(value) ? 0 : value));
+        const filled = num > 0 ? `<span class="review-rating-filled" aria-hidden="true">${'★'.repeat(num)}</span>` : '';
+        const empty = num < 5 ? `<span class="review-rating-empty" aria-hidden="true">${'☆'.repeat(5 - num)}</span>` : '';
+        return filled + empty;
     }
 
     showError(message) {
