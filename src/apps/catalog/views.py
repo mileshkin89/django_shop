@@ -8,9 +8,6 @@ from django.urls import reverse_lazy, reverse
 from apps.order.models import Order, OrderItem
 
 
-# from ..review.forms import ReplyForm, ReviewForm
-# from ..review.models import Review
-
 
 class HomePageView(TemplateView):
     template_name = 'pages/home.html'
@@ -55,20 +52,24 @@ class ProductListView(ListView):
     def apply_category_filters_queryset(self, queryset):
         return queryset
 
-    def get_options_scope_queryset(self):
+    def _get_category_filtered_queryset(self):
         queryset = self._get_base_queryset()
         return self.apply_category_filters_queryset(queryset)
 
+    def get_options_scope_queryset(self):
+        if not hasattr(self, "_options_scope_queryset"):
+            self._options_scope_queryset = self._get_category_filtered_queryset()
+        return self._options_scope_queryset
+
     def get_queryset(self):
-        queryset = self._get_base_queryset()
+        queryset = self._get_category_filtered_queryset()
+        self._options_scope_queryset = queryset  
 
         query = self.request.GET.get('q')
         if query:
             queryset = queryset.filter(
                 Q(product_display_name__icontains=query)
             )
-
-        queryset = self.apply_category_filters_queryset(queryset)
 
         gender_param = self.request.GET.get("gender")
         if gender_param:
@@ -128,13 +129,15 @@ class ProductListView(ListView):
         context["selected_seasons"] = selected_seasons
 
         scope_queryset = self.get_options_scope_queryset()
-
-        context["gender_options"] = list(
-            scope_queryset.values_list("gender", flat=True).distinct().order_by("gender")
+        scope_rows = list(
+            scope_queryset.values("gender", "season__name", "season__slug").distinct()
         )
-
-        context["season_options"] = list(
-            scope_queryset.values_list("season__name", "season__slug").distinct().order_by("season__name")
+        context["gender_options"] = sorted(
+            {r["gender"] for r in scope_rows if r["gender"] is not None}
+        )
+        context["season_options"] = sorted(
+            {(r["season__name"], r["season__slug"]) for r in scope_rows if r["season__name"] is not None},
+            key=lambda x: x[0],
         )
 
         params = self.request.GET.copy()

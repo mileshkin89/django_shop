@@ -1,71 +1,192 @@
-# django_shop
+# Django Shop
 
-Shop on Django, DRF, Docker.
+[![Python](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
+[![Django](https://img.shields.io/badge/django-5.2+-green.svg)](https://www.djangoproject.com/)
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com/)
+
+E-commerce web application built with Django, Django REST Framework, and Docker. Includes catalog, cart, checkout, user accounts, and admin tooling.
+
+---
+
+## Table of Contents
+
+- [Description](#description)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Development](#development)
+- [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Tech Stack](#tech-stack)
+
+---
+
+## Description
+
+Django Shop is a full-stack online store that provides:
+
+- Product catalog with categories and search
+- Shopping cart and checkout flow
+- User registration, authentication, and password reset
+- Django admin for content and order management
+- REST API (DRF) for integration
+- Docker-based deployment with PostgreSQL and PgBouncer
+
+---
+
+## Requirements
+
+- [Python](https://www.python.org/) 3.13+
+- [Docker](https://www.docker.com/) and Docker Compose
+- [uv](https://github.com/astral-sh/uv) (recommended) or pip for local dependency management
+- [GNU Make](https://www.gnu.org/software/make/) (optional, for `make` targets)
+
+---
 
 ## Installation
 
-Follow these steps to set up and run the application:
+1. **Clone the repository** (if not already):
 
-1.  **Install `uv`**: First, install the `uv` package manager using pip.
-    ```bash
-    pip install uv
-    ```
+   ```bash
+   git clone <repository-url>
+   cd django_shop
+   ```
 
-2.  **Install dependencies**: Use `uv` to synchronize the project's dependencies based on `pyproject.toml` and `uv.lock`.
-    ```bash
-    uv sync
-    ```
+2. **Install `uv`** (recommended package manager):
 
-3.  **Configure environment variables**:
-    - Copy `.env.sample` to `.env` and fill in the necessary information.
-    - Copy `services/pgbouncer/.env.sample` to `services/pgbouncer/.env` and fill in the necessary information.
+   ```bash
+   pip install uv
+   ```
 
-4.  **Build Docker containers**: This command builds the necessary Docker images for the application services.
-    ```bash
-    make build
-    ```
+3. **Install project dependencies** (for local development without Docker):
 
-5.  **Start all services**: This will start the Docker containers in detached mode.
-    ```bash
-    make up
-    ```
-    The application will be accessible at `http://localhost:8000/`.
+   ```bash
+   uv sync
+   ```
 
-6.  **Run Django migrations**: Apply database migrations to set up the database schema.
-    ```bash
-    make migrate
-    ```
+   Dependencies are defined in `pyproject.toml` and locked in `uv.lock`.
 
-7.  **Seed the database with test data (Optional)**: Populate the database with sample users, catalog items, inventories, ratings, and favorites.
-    ```bash
-    make seed-all
-    ```
+4. **Configure environment variables** (see [Configuration](#configuration)).
 
-8.  **Create a Django admin superuser (Optional)**: Create an admin user for the Django administration panel.
-    ```bash
-    make create-admin
-    ```
+5. **Build Docker images**:
+
+   ```bash
+   make build
+   ```
+
+6. **Start services**:
+
+   ```bash
+   make up
+   ```
+
+   The application is available at **http://localhost:8000/**.
+
+7. **Apply database migrations**:
+
+   ```bash
+   make migrate
+   ```
+
+8. **(Optional) Seed the database** with sample users, catalog, inventories, ratings, and favorites:
+
+   ```bash
+   make seed-all
+   ```
+
+9. **(Optional) Create a Django superuser** for the admin panel:
+
+   ```bash
+   make create-admin
+   ```
+
+---
+
+## Configuration
+
+Environment variables are loaded from `.env`. Use the samples as templates:
+
+| File | Purpose |
+|------|--------|
+| `.env.sample` | Main application (Django, DB, etc.) |
+| `services/pgbouncer/.env.sample` | PgBouncer connection pooler |
+
+Copy each sample to `.env` (or `services/pgbouncer/.env`) and set values for your environment (e.g. `SECRET_KEY`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`).
+
+---
+
+## Usage
+
+- **Web UI:** Open http://localhost:8000/ in a browser.
+- **Admin:** http://localhost:8000/admin/ (requires a superuser from `make create-admin`).
+- **API:** REST endpoints are available under the configured API base path (see project URLs).
+
+---
 
 ## Development
 
--   **Stop all services**:
-    ```bash
-    make down
-    ```
+| Command | Description |
+|--------|-------------|
+| `make help` | List all available Make targets |
+| `make up` | Start all services (detached) |
+| `make down` | Stop all services |
+| `make logs` | Stream container logs |
+| `make restart` | Stop, rebuild, and start services |
+| `make migrate` | Run Django migrations |
+| `make seed-all` | Seed database with test data |
+| `make create-admin` | Create Django superuser |
+| `make clean-all` | Remove all seeded test data |
+| `make test` | Run the test suite in Docker |
 
--   **Show container logs**:
-    ```bash
-    make logs
-    ```
+---
 
--   **Restart services (down, build, up)**:
-    ```bash
-    make restart
-    ```
+## Testing
+
+Run the full test suite (starts DB, runs tests, stops DB):
+
+```bash
+make test
+```
+
+Tests are executed inside the `web` container with a temporary database. For local pytest runs without Docker, ensure the database is available and use:
+
+```bash
+uv run pytest
+```
+
+---
 
 ## Project Structure
 
--   `src/`: Contains the Django project and applications.
--   `docker-compose.yml`: Defines the services for Docker Compose.
--   `Dockerfile`: Dockerfile for the web service.
--   `Makefile`: Contains shortcuts for common development and deployment tasks.
+```
+django_shop/
+├── src/                    # Django project and apps
+│   ├── apps/               # Application modules (catalog, cart, accounts, etc.)
+│   ├── static/             # Static assets (CSS, JS, images)
+│   ├── templates/          # HTML templates
+│   └── ...
+├── services/
+│   └── pgbouncer/          # PgBouncer service and config
+├── docker-compose.yml      # Service definitions
+├── Dockerfile              # Web service image
+├── Makefile                # Development and deployment shortcuts
+├── pyproject.toml          # Python project and dependencies
+└── uv.lock                 # Locked dependency versions
+```
+
+---
+
+## Tech Stack
+
+- **Backend:** Django 5.2+, Django REST Framework
+- **Database:** PostgreSQL 17 (with PgBouncer for connection pooling)
+- **Package management:** uv, pyproject.toml
+- **Containerization:** Docker, Docker Compose
+- **Testing:** pytest, pytest-django
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
