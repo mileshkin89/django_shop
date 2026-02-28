@@ -89,6 +89,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
 
     # Project apps
     'apps.catalog',
@@ -311,6 +312,21 @@ SOCIALACCOUNT_PROVIDERS = {
         "APP": {
             "client_id": os.getenv("GOOGLE_CLIENT_ID", ""),
             "secret": os.getenv("GOOGLE_CLIENT_SECRET", ""),
+        },
+    },
+    "facebook": {
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "public_profile"],
+        "FIELDS": [
+            "id",
+            "email",
+            "name",
+            "first_name",
+            "last_name",
+        ],
+        "APP": {
+            "client_id": os.getenv("FACEBOOK_CLIENT_ID", ""),
+            "secret": os.getenv("FACEBOOK_CLIENT_SECRET", ""),
         },
     },
 }
