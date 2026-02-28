@@ -1,5 +1,6 @@
 {% extends 'layout/base.html' %}
 {% load static %}
+{% load socialaccount %}
 
 {% block title %}Login{% endblock %}
 
@@ -48,7 +49,24 @@
                     </div>
                 </form>
 
-                <p class="auth-switch">Don’t have an account? <a href="{% url 'accounts:register' %}">Sign up</a></p>
+                {% get_providers as socialaccount_providers %}
+                {% if socialaccount_providers %}
+                    <div class="social-login-divider">
+                        <span>or</span>
+                    </div>
+                    <div class="social-login-buttons">
+                        {% for provider in socialaccount_providers %}
+                            <a href="{% provider_login_url provider.id %}"
+                               class="button button--social button--{{ provider.id }}">
+                                <img src="{% static 'img/icons/social/'|add:provider.id|add:'.svg' %}"
+                                     alt="{{ provider.name }}" width="20" height="20">
+                                Sign in with {{ provider.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <p class="auth-switch">Don't have an account? <a href="{% url 'accounts:register' %}">Sign up</a></p>
             </div>
         </div>
     </main>

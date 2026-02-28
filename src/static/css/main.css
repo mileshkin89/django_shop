@@ -504,6 +504,61 @@ p, h1, h2, h3, h4, h5, h6 {
 
 /*
 ========================================
+    Social Login
+========================================
+*/
+
+.social-login-divider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.social-login-divider::before,
+.social-login-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: var(--border-default);
+}
+
+.social-login-divider span {
+    font-size: 14px;
+    color: var(--grey-text);
+    white-space: nowrap;
+}
+
+.social-login-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.button--social {
+    width: 100%;
+    height: 40px;
+    padding: 8px 16px;
+    gap: 8px;
+    background-color: var(--background-grey);
+    border: 1px solid var(--border-default);
+    color: var(--black-main);
+    font-weight: 500;
+}
+
+.button--social:hover {
+    background-color: var(--slate-200);
+    border-color: var(--border-dark-grey);
+}
+
+.button--social img {
+    flex-shrink: 0;
+}
+
+
+/*
+========================================
     Forgot Password Page Specific Styles
 ========================================
 */
