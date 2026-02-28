@@ -1,9 +1,5 @@
 # Django Shop
 
-[![Python](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
-[![Django](https://img.shields.io/badge/django-5.2+-green.svg)](https://www.djangoproject.com/)
-[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com/)
-
 E-commerce web application built with Django, Django REST Framework, and Docker. Includes catalog, cart, checkout, user accounts, and admin tooling.
 
 ---
@@ -29,6 +25,7 @@ Django Shop is a full-stack online store that provides:
 - Product catalog with categories and search
 - Shopping cart and checkout flow
 - User registration, authentication, and password reset
+- Social login via OAuth 2.0 (Google, Facebook) with guest cart merging
 - Django admin for content and order management
 - REST API (DRF) for integration
 - Docker-based deployment with PostgreSQL and PgBouncer
@@ -109,10 +106,26 @@ Environment variables are loaded from `.env`. Use the samples as templates:
 
 | File | Purpose |
 |------|--------|
-| `.env.sample` | Main application (Django, DB, etc.) |
+| `.env.sample` | Main application (Django, DB, OAuth, etc.) |
 | `services/pgbouncer/.env.sample` | PgBouncer connection pooler |
 
 Copy each sample to `.env` (or `services/pgbouncer/.env`) and set values for your environment (e.g. `SECRET_KEY`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`).
+
+### OAuth 2.0 (Social Login)
+
+The application supports social authentication via Google and Facebook. To enable it, set the following variables in `.env`:
+
+| Variable | Description |
+|----------|-------------|
+| `GOOGLE_CLIENT_ID` | Google OAuth 2.0 Client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth 2.0 Client Secret |
+| `FACEBOOK_CLIENT_ID` | Facebook OAuth App ID |
+| `FACEBOOK_CLIENT_SECRET` | Facebook OAuth App Secret |
+
+To obtain these credentials:
+
+- **Google:** Create a project in [Google Cloud Console](https://console.cloud.google.com/), enable the Google+ API, and create OAuth 2.0 credentials. Add `http://localhost:8000/accounts/social/google/login/callback/` as an authorized redirect URI.
+- **Facebook:** Create an app in [Meta for Developers](https://developers.facebook.com/), add Facebook Login, and configure `http://localhost:8000/accounts/social/facebook/login/callback/` as a valid redirect URI.
 
 ---
 
@@ -180,6 +193,7 @@ django_shop/
 ## Tech Stack
 
 - **Backend:** Django 5.2+, Django REST Framework
+- **Authentication:** django-allauth (email + OAuth 2.0 via Google, Facebook)
 - **Database:** PostgreSQL 17 (with PgBouncer for connection pooling)
 - **Package management:** uv, pyproject.toml
 - **Containerization:** Docker, Docker Compose
