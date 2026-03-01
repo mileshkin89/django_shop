@@ -326,8 +326,9 @@ class CheckoutDetailsView(LoginRequiredMixin, View):
         order.updated_at = timezone.now()
         order.save(update_fields=['shipping_address', 'updated_at'])
 
-        success_url = request.build_absolute_uri('/checkout/success/?session_id={CHECKOUT_SESSION_ID}')
-        cancel_url = request.build_absolute_uri('/checkout/cancel/')
+        base = f"{request.scheme}://{request.get_host()}"
+        success_url = base + f"/checkout/success/?order_id={order.id}"
+        cancel_url = base + "/checkout/cancel/"
 
         try:
             stripe_url = create_checkout_session(order, success_url, cancel_url)
@@ -339,16 +340,37 @@ class CheckoutDetailsView(LoginRequiredMixin, View):
         return redirect(stripe_url)
 
 
-class CheckoutSuccessView(LoginRequiredMixin, TemplateView):
+class CheckoutSuccessView(LoginRequiredMixin, View):
     template_name = 'pages/cart/checkout_success.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        session_id = self.request.GET.get("session_id")
-        if session_id:
-            order = Order.objects.filter(stripe_session_id=session_id).first()
-            context["order"] = order
-        return context
+    def get(self, request):
+        context = {"payment_success": False}
+        order_id = request.GET.get("order_id")
+
+        if not order_id:
+            return render(request, self.template_name, context)
+
+        order = Order.objects.filter(id=order_id, user=request.user).first()
+        if not order or not order.stripe_session_id:
+            return render(request, self.template_name, context)
+
+        context["order"] = order
+
+        try:
+            session = stripe.checkout.Session.retrieve(order.stripe_session_id)
+        except stripe.StripeError:
+            logger.exception("Failed to retrieve Stripe session for order %s", order.id)
+            return render(request, self.template_name, context)
+
+        if session.payment_status == "paid":
+            context["payment_success"] = True
+            if order.status == "Pending":
+                order.checkout_complete()
+                logger.info("Order %s completed via success page fallback", order.id)
+        else:
+            context["payment_success"] = False
+
+        return render(request, self.template_name, context)
 
 
 class CheckoutCancelView(LoginRequiredMixin, View):

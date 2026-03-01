@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' %}
 {% load static %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Checkout Result{% endblock %}
 
 {% block extra_css %}
 {% endblock %}
@@ -20,13 +20,22 @@
         <div class="auth-form-container">
             <div class="auth-container auth-container--login">
                 <div class="Legend">
-                    <h1 class="auth-title">Payment successful. Order placed.</h1>
-                    {% if order %}
-                        <p>Order #{{ order.id }}</p>
+                    {% if payment_success %}
+                        <h1 class="auth-title">Payment successful. Order placed.</h1>
+                        {% if order %}
+                            <p>Order #{{ order.id }}</p>
+                        {% endif %}
+                    {% else %}
+                        <h1 class="auth-title">Payment failed</h1>
+                        <p>Something went wrong with your payment. Please try again.</p>
                     {% endif %}
                 </div>
 
-                <a href="{% url 'catalog:product_list' %}" class="button button--secondary button--back">Back to catalog</a>
+                {% if payment_success %}
+                    <a href="{% url 'catalog:product_list' %}" class="button button--secondary button--back">Back to catalog</a>
+                {% else %}
+                    <a href="{% url 'order:cart' %}" class="button button--secondary button--back">Back to cart</a>
+                {% endif %}
             </div>
         </div>
     </main>
