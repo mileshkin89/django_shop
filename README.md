@@ -23,7 +23,7 @@ E-commerce web application built with Django, Django REST Framework, and Docker.
 Django Shop is a full-stack online store that provides:
 
 - Product catalog with categories and search
-- Shopping cart and checkout flow
+- Shopping cart, checkout flow, and Stripe payments
 - User registration, authentication, and password reset
 - Social login via OAuth 2.0 (Google, Facebook) with guest cart merging
 - Django admin for content and order management
@@ -127,6 +127,57 @@ To obtain these credentials:
 - **Google:** Create a project in [Google Cloud Console](https://console.cloud.google.com/), enable the Google+ API, and create OAuth 2.0 credentials. Add `http://localhost:8000/accounts/social/google/login/callback/` as an authorized redirect URI.
 - **Facebook:** Create an app in [Meta for Developers](https://developers.facebook.com/), add Facebook Login, and configure `http://localhost:8000/accounts/social/facebook/login/callback/` as a valid redirect URI.
 
+### Stripe (Payments)
+
+The checkout flow uses [Stripe Checkout Sessions](https://docs.stripe.com/payments/checkout) for payment processing. Set the following variables in `.env`:
+
+| Variable | Description |
+|----------|-------------|
+| `STRIPE_SECRET_KEY` | Stripe secret API key (starts with `sk_test_` or `sk_live_`) |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable API key (starts with `pk_test_` or `pk_live_`) |
+| `STRIPE_WEBHOOK_SECRET` | Webhook signing secret (starts with `whsec_`) |
+
+#### Obtaining Stripe API Keys
+
+1. Create an account at [Stripe Dashboard](https://dashboard.stripe.com/).
+2. Navigate to **Developers → API keys**.
+3. Copy the **Publishable key** and **Secret key** (use test-mode keys for development).
+4. Paste them into `.env` as `STRIPE_PUBLISHABLE_KEY` and `STRIPE_SECRET_KEY`.
+
+#### Running the Stripe Webhook Locally
+
+Stripe sends asynchronous events (e.g. `checkout.session.completed`) to your server via webhooks. During local development, use the [Stripe CLI](https://docs.stripe.com/stripe-cli) to forward events:
+
+1. Install the Stripe CLI:
+
+   ```bash
+   # macOS
+   brew install stripe/stripe-cli/stripe
+
+   # Windows (scoop)
+   scoop install stripe
+
+   # Or download from https://docs.stripe.com/stripe-cli#install
+   ```
+
+2. Log in to your Stripe account:
+
+   ```bash
+   stripe login
+   ```
+
+3. Forward webhook events to your local server:
+
+   ```bash
+   stripe listen --forward-to localhost:8000/checkout/webhook/stripe/
+   ```
+
+4. The CLI will print a webhook signing secret (e.g. `whsec_...`). Copy it and set it as `STRIPE_WEBHOOK_SECRET` in `.env`.
+
+5. Keep the `stripe listen` process running while testing payments.
+
+> **Note:** In production, create a webhook endpoint in the Stripe Dashboard (**Developers → Webhooks**) pointing to `https://yourdomain.com/checkout/webhook/stripe/` and subscribe to the `checkout.session.completed` event.
+
 ---
 
 ## Usage
@@ -193,6 +244,7 @@ django_shop/
 ## Tech Stack
 
 - **Backend:** Django 5.2+, Django REST Framework
+- **Payments:** Stripe Checkout Sessions
 - **Authentication:** django-allauth (email + OAuth 2.0 via Google, Facebook)
 - **Database:** PostgreSQL 17 (with PgBouncer for connection pooling)
 - **Package management:** uv, pyproject.toml
