@@ -1,20 +1,27 @@
 import json
+import logging
+
+import stripe
+from django.conf import settings as django_settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db import transaction, IntegrityError
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.contrib.auth import get_user_model
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, TemplateView
-from django.http import QueryDict
 
 from .models import Order, OrderItem, Inventory
+from .stripe_service import create_checkout_session, handle_checkout_completed
 from apps.catalog.models import Product
 from apps.accounts.models import ShippingAddress
 from .reserve_cleaner.decorator import clear_expired_reserves
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -261,9 +268,8 @@ class CheckoutDetailsView(LoginRequiredMixin, View):
         phone = request.POST.get('phone')
         email = request.POST.get('email')
         address = request.POST.get('address')
-        payment_method = request.POST.get('payment_method')
 
-        if not all([first_name, last_name, phone, email, address, payment_method]):
+        if not all([first_name, last_name, phone, email, address]):
             messages.error(request, "Please fill in all fields.")
             shipping_addresses = ShippingAddress.objects.filter(user=request.user)
             return render(request, self.template_name, {
@@ -297,13 +303,12 @@ class CheckoutDetailsView(LoginRequiredMixin, View):
                 })
 
         try:
-            # Update user data
             user.first_name = first_name
             user.last_name = last_name
             user.phone_number = phone
             user.email = email
             user.save(update_fields=['first_name', 'last_name', 'phone_number', 'email'])
-        except IntegrityError as e:
+        except IntegrityError:
             messages.error(request, "Error saving data. The email or phone number may already be in use.")
             shipping_addresses = ShippingAddress.objects.filter(user=request.user)
             return render(request, self.template_name, {
@@ -312,22 +317,71 @@ class CheckoutDetailsView(LoginRequiredMixin, View):
                 'shipping_addresses': shipping_addresses,
             })
 
-        # Create or get the shipping address
         shipping_address, _ = ShippingAddress.objects.get_or_create(
             user=user,
             shipping_address=address,
         )
 
-        # Save the shipping address on the order
         order.shipping_address = shipping_address
         order.updated_at = timezone.now()
         order.save(update_fields=['shipping_address', 'updated_at'])
 
-        order.checkout_complete()
+        success_url = request.build_absolute_uri('/checkout/success/?session_id={CHECKOUT_SESSION_ID}')
+        cancel_url = request.build_absolute_uri('/checkout/cancel/')
 
-        messages.success(request, "Order completed successfully.")
-        return redirect('order:checkout_success')
+        try:
+            stripe_url = create_checkout_session(order, success_url, cancel_url)
+        except stripe.StripeError:
+            logger.exception("Stripe session creation failed for order %s", order.id)
+            messages.error(request, "Payment service is temporarily unavailable. Please try again.")
+            return redirect('order:checkout_details')
+
+        return redirect(stripe_url)
 
 
-class CheckoutSuccessView(TemplateView):
+class CheckoutSuccessView(LoginRequiredMixin, TemplateView):
     template_name = 'pages/cart/checkout_success.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        session_id = self.request.GET.get("session_id")
+        if session_id:
+            order = Order.objects.filter(stripe_session_id=session_id).first()
+            context["order"] = order
+        return context
+
+
+class CheckoutCancelView(LoginRequiredMixin, View):
+    def get(self, request):
+        order = getattr(request, 'order', None)
+
+        if order and order.status == 'Pending':
+            order.stripe_session_id = None
+            order.save(update_fields=["stripe_session_id", "updated_at"])
+            order.checkout_cancel()
+
+        messages.info(request, "Payment was cancelled.")
+        return redirect('order:cart')
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class StripeWebhookView(View):
+    def post(self, request):
+        payload = request.body
+        sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, django_settings.STRIPE_WEBHOOK_SECRET,
+            )
+        except ValueError:
+            logger.warning("Invalid Stripe webhook payload")
+            return HttpResponse(status=400)
+        except stripe.SignatureVerificationError:
+            logger.warning("Invalid Stripe webhook signature")
+            return HttpResponse(status=400)
+
+        if event["type"] == "checkout.session.completed":
+            handle_checkout_completed(event["data"]["object"])
+
+        return HttpResponse(status=200)

@@ -284,6 +284,12 @@ ORDER_COOKIE_SECURE = True
 ORDER_COOKIE_HTTPONLY = True
 ORDER_COOKIE_SAMESITE = "Lax"
 
+# Stripe
+
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+
 # Password reset by email
 PASSWORD_RESET_TIMEOUT = 900  # 15 minutes (in seconds)
 if DEBUG:

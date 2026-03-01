@@ -44,28 +44,6 @@
                     </div>
                 </section>
 
-                <!-- Payment Method -->
-                <section class="checkout-section">
-                    <h2 class="checkout-section__title">Payment Method</h2>
-                    <div class="payment-options">
-                        <label class="radio-option">
-                            <input type="radio" name="payment_method" value="debit" checked>
-                            <span class="radio-custom"></span>
-                            <span class="radio-label">Debit Card</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="payment_method" value="wallet">
-                            <span class="radio-custom"></span>
-                            <span class="radio-label">Digital Wallet</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="payment_method" value="cod">
-                            <span class="radio-custom"></span>
-                            <span class="radio-label">Cash On Delivery</span>
-                        </label>
-                    </div>
-                </section>
-
                 <!-- Order Summary -->
                 <section class="checkout-summary">
                     <h2 class="checkout-section__title">Order Summary</h2>
@@ -74,7 +52,7 @@
                             <p>Total</p>
                             <p>${{ order.total_price }}</p>
                         </div>
-                        <button type="submit" class="button button--primary button--pay">Pay</button>
+                        <button type="submit" class="button button--primary button--pay">Continue to payment</button>
                         <a href="{% url 'order:cart' %}" class="button button--secondary button--back">Back to cart</a>
                     </div>
                 </section>

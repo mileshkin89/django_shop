@@ -12,4 +12,6 @@ urlpatterns = [
     path('checkout/start/', views.CheckoutStartView.as_view(), name='checkout_start'),
     path('checkout/details/', views.CheckoutDetailsView.as_view(), name='checkout_details'),
     path('checkout/success/', views.CheckoutSuccessView.as_view(), name='checkout_success'),
+    path('checkout/cancel/', views.CheckoutCancelView.as_view(), name='checkout_cancel'),
+    path('checkout/webhook/stripe/', views.StripeWebhookView.as_view(), name='stripe_webhook'),
 ]

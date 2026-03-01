@@ -20,4 +20,5 @@ dependencies = [
     "pytest-django>=4.11.1",
     "pytest-html>=4.1.1",
     "tqdm>=4.67.1",
+    "stripe>=14.4.0",
 ]

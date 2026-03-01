@@ -68,6 +68,10 @@ class Order(models.Model):
     status = models.CharField(default='Cart', max_length=15, choices=StatusChoices.choices)
     total_price = models.DecimalField(default=0, max_digits=10, decimal_places=2)
 
+    stripe_session_id = models.CharField(
+        max_length=255, unique=True, db_index=True, null=True, blank=True,
+    )
+
     reserve_token = models.CharField(max_length=64, unique=True, db_index=True, null=True, blank=True)
     reserve_expires_at = models.DateTimeField(null=True, blank=True)
 
